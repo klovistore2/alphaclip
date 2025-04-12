@@ -25,6 +25,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
 
 import { ModeToggle } from "@/components/theme-toggle"
@@ -33,8 +34,8 @@ import { ModeToggle } from "@/components/theme-toggle"
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "ClipDraw",
+    email: "@mail",
     avatar: "/avatars/shadcn.jpg",
   },
 
@@ -190,8 +191,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   
   return (
     <Sidebar collapsible="icon" {...props}>
-      
-      <SidebarHeader>
+    <SidebarTrigger className="-ml-1" />
+    <SidebarHeader>
 
       </SidebarHeader>
       
