@@ -1,0 +1,34 @@
+
+// create image
+- Text2image (SD / FLUX / GPT / GEMINI / DEEPSEEK )
+- PAINT / canva 
+- upload
+
+//Adjust image
+- inpainting
+- delete object
+- variation
+- upscale
+- filtre
+- style transfert
+- delete background
+- faceswap
+
+// generate video
+- text2video | kling etc veo
+- image2video | gemini veo, luma, kling
+
+//Video editing
+- lip sync
+- add sound
+- make it longer
+- compress
+- editing / sub title ?
+
+// Historique
+- image gallery
+- video gallery
+- sound gallery
+
+//ajouter les transition
+//suspend (sur la gallery)
