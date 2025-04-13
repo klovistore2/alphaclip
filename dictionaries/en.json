@@ -8,5 +8,11 @@
       "description": "Create an image using a text prompt.",
       "prompt": "Enter a text prompt to generate an image.",
       "button": "Generate Image"
+    },
+    "nav": {
+      "playground": "Playground",
+      "playgroundAI": "Playground AI",
+      "paintStudio": "Paint Studio",
+      "models": "Models"
     }
   }

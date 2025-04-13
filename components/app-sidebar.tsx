@@ -48,7 +48,7 @@ const data = {
       items: [
         {
           title: "Image",
-          url: "#",
+          url: "/dashboard//gallery//image",
         },
         {
           title: "Video",
@@ -72,14 +72,6 @@ const data = {
         {
           title: "Canva",
           url: "/dashboard//create//canva",
-        },
-        {
-          title: "Uploads",
-          url: "#",
-        },
-        {
-          title: "Playground",
-          url: "/dashboard//create//playground",
         },
       ],
     },
