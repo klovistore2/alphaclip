@@ -98,7 +98,7 @@ const data = {
         },
         {
           title: "Playground",
-          url: "/dashboard//image2image//playground/",
+          url: "/dashboard//image2image//playground2/",
         },
       ],
     },
