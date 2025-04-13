@@ -26,12 +26,13 @@ export const metadata: Metadata = {
 export default async function ImageToImagePlayground({
   params,
 }: {
-  params: Promise<{ lang: 'en' | 'fr'; image: string }>
+  params: Promise<{ lang: 'en' | 'fr'; image?: string }>
 }) {
   const { lang, image } = await params;
+  const imageParam = image || "default-image"; // Par exemple : "default-image"
 
   const dict = await getDictionary(lang); // Récupère le dictionnaire pour la langue
-  console.log("Image param:", image); // Debug : Affiche le paramètre image
+  console.log("Image param:", imageParam); // Debug : Affiche le paramètre image
 
 
   return (

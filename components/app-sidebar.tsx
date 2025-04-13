@@ -90,7 +90,7 @@ const data = {
         },
         {
           title: "Remove Background",
-          url: "#",
+          url: "/dashboard//image2image//playground3/1",
         },
         {
           title: "Image Variations",
