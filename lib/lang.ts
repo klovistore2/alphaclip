@@ -10,3 +10,4 @@ export const languageNames: Record<Locale_, string> = {
   de: "Deutsch",
   ja: "日本語",
 }
+

@@ -14,12 +14,13 @@ import {
   } from "@/components/ui/sidebar"
 
 import { getDictionary } from "@/app/[lang]/dictionaries"  
+import { Localy } from "@/app/[lang]/dictionaries" // Importez le type Locale
 
  
 export default async function Page({
   params,
 }: {
-  params: Promise<{ lang: 'en' | 'fr' }>
+  params: Promise<{ lang: Localy }>
 }) {
   
   const { lang } = await params
