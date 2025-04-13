@@ -52,7 +52,7 @@ const data = {
         },
         {
           title: "Video",
-          url: "#",
+          url: "/dashboard//gallery//videos",
         },
         {
           title: "Sound",

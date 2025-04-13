@@ -2,7 +2,6 @@
 // create image
 - Text2image (SD / FLUX / GPT / GEMINI / DEEPSEEK )
 - PAINT / canva 
-- upload
 
 //Adjust image
 - inpainting
@@ -13,6 +12,7 @@
 - style transfert
 - delete background
 - faceswap
+- scribble
 
 // generate video
 - text2video | kling etc veo
