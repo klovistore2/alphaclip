@@ -1,3 +1,8 @@
+promptube.xyz
+yourtubbb.com
+tubedeep.com
+yatubbb.com
+aitubbb.com
 
 // create image
 - Text2image (SD / FLUX / GPT / GEMINI / DEEPSEEK )

@@ -5,12 +5,22 @@ import React, { useRef, useEffect, useState } from 'react';
 import { fabric } from 'fabric';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel, // Optionnel
+    DropdownMenuSeparator, // Optionnel
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 
 const FabricCanvas = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isDrawingMode, setIsDrawingMode] = useState<boolean>(false);
+    const [activeTool, setActiveTool] = useState<'select' | 'pen'>('select'); // Outil actif
+    const [penWidth, setPenWidth] = useState<number>(2); // Épaisseur actuelle du stylo
 
     // --- Ajout d'une référence pour le conteneur du canvas ---
     const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -53,6 +63,8 @@ const FabricCanvas = () => {
             const handleKeyDown = (event: KeyboardEvent) => {
                 // Vérifie si le canevas existe
                 if (!fabricCanvasRef.current) return;
+
+                if (activeTool !== 'select') return;
 
                  // Vérifie si la touche est Delete ou Backspace
                 if (event.key === 'Delete' || event.key === 'Backspace') {
@@ -107,27 +119,39 @@ const FabricCanvas = () => {
         }
     }, []); // S'exécute une seule fois au montage
 
-    const toggleDrawingMode = () => {
-        if (fabricCanvasRef.current) {
-            const currentMode = !fabricCanvasRef.current.isDrawingMode;
-            fabricCanvasRef.current.isDrawingMode = currentMode;
-            setIsDrawingMode(currentMode);
-            if (currentMode) {
-                fabricCanvasRef.current.freeDrawingBrush.color = 'black';
-                fabricCanvasRef.current.freeDrawingBrush.width = 2;
-            }
-            console.log("Drawing mode:", currentMode);
-        }
+    // Fonction pour activer le mode Sélection
+    const activateSelectMode = () => {
+        if (!fabricCanvasRef.current) return;
+        fabricCanvasRef.current.isDrawingMode = false; // Désactive le mode dessin
+        setActiveTool('select'); // Met à jour l'état
+        console.log("Switched to Select mode");
+    };
+
+    // Fonction pour activer le mode Stylo avec une épaisseur donnée
+    const activatePen = (width: number) => {
+        if (!fabricCanvasRef.current) return;
+        fabricCanvasRef.current.isDrawingMode = true; // Active le mode dessin
+        fabricCanvasRef.current.freeDrawingBrush.color = 'black'; // Toujours noir
+        fabricCanvasRef.current.freeDrawingBrush.width = width; // Applique l'épaisseur choisie
+        setPenWidth(width); // Met à jour l'état de l'épaisseur
+        setActiveTool('pen'); // Met à jour l'état de l'outil
+        console.log(`Switched to Pen mode with width: ${width}`);
+    };
+
+    const ensureSelectMode = (callback: () => void) => {
+        // Appelle la nouvelle fonction pour passer en mode sélection
+        activateSelectMode();
+        // Le setTimeout est toujours utile pour décaler l'exécution du callback
+        setTimeout(callback, 0);
     };
 
     const addRectangle = () => {
-        if (fabricCanvasRef.current) {
-            fabricCanvasRef.current.isDrawingMode = false;
-            setIsDrawingMode(false);
-
+        // Utilise ensureSelectMode maintenant
+        ensureSelectMode(() => {
+            if (!fabricCanvasRef.current) return;
             const rect = new fabric.Rect({
                 left: 100, top: 100,
-                fill: 'rgba(220, 220, 220, 0.8)', stroke: 'grey', strokeWidth: 1,
+                fill: 'black', // Couleur noire opaque
                 width: 80, height: 80,
                 selectable: true, hasControls: true, hasBorders: true,
             });
@@ -135,15 +159,71 @@ const FabricCanvas = () => {
             fabricCanvasRef.current.setActiveObject(rect);
             fabricCanvasRef.current.renderAll();
             console.log("Rectangle added");
-        }
+        });
     };
 
-    const handleImageUploadClick = () => {
-        if (fabricCanvasRef.current?.isDrawingMode) {
-             toggleDrawingMode(); // Correction : Appeler la fonction pour basculer proprement
-        }
-        fileInputRef.current?.click();
-    };
+    // Nouvelle fonction pour ajouter un cercle
+        const addCircle = () => {
+            ensureSelectMode(() => {
+                if (!fabricCanvasRef.current) return;
+                const circle = new fabric.Circle({
+                    left: 120, top: 120, // Position légèrement différente
+                    radius: 40, // Rayon du cercle
+                    fill: 'black',
+                    selectable: true, hasControls: true, hasBorders: true,
+                });
+                fabricCanvasRef.current.add(circle);
+                fabricCanvasRef.current.setActiveObject(circle);
+                fabricCanvasRef.current.renderAll();
+                console.log("Circle added");
+            });
+        };
+
+
+        // Nouvelle fonction pour ajouter un triangle
+        const addTriangle = () => {
+        ensureSelectMode(() => {
+        if (!fabricCanvasRef.current) return;
+        const triangle = new fabric.Triangle({
+            left: 140, top: 140,
+            width: 80, // Base du triangle
+            height: 70, // Hauteur du triangle
+            fill: 'black',
+            selectable: true, hasControls: true, hasBorders: true,
+        });
+        fabricCanvasRef.current.add(triangle);
+        fabricCanvasRef.current.setActiveObject(triangle);
+        fabricCanvasRef.current.renderAll();
+        console.log("Triangle added");
+        });
+        };
+
+
+        // Nouvelle fonction pour ajouter une ligne (barre)
+    const addLine = () => {
+    ensureSelectMode(() => {
+       if (!fabricCanvasRef.current) return;
+       const line = new fabric.Line(
+           [50, 150, 250, 150], // Coordonnées [x1, y1, x2, y2] -> ligne horizontale
+           {
+               stroke: 'black', // Couleur de la ligne
+               strokeWidth: 4, // Épaisseur de la ligne
+               selectable: true, hasControls: true, hasBorders: false, // Les bordures sont moins utiles pour une ligne
+               // Les lignes n'ont pas de 'fill'
+           }
+       );
+       fabricCanvasRef.current.add(line);
+       fabricCanvasRef.current.setActiveObject(line);
+       fabricCanvasRef.current.renderAll();
+       console.log("Line added");
+   });
+};
+
+
+const handleImageUploadClick = () => {
+    activateSelectMode(); // Passe en mode sélection avant d'ouvrir la boîte de dialogue
+    fileInputRef.current?.click();
+};
 
     const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
        // ... code identique ...
@@ -181,16 +261,65 @@ const FabricCanvas = () => {
         <div className="flex flex-col h-full w-full max-h-full max-w-full"> {/* Limite la taille globale du comp */}
             {/* Barre d'outils (inchangée) */}
             <div className="flex gap-2 p-2 border-b bg-background shrink-0"> {/* shrink-0 empêche la toolbar de rétrécir */}
-                 <Button
-                    variant={isDrawingMode ? "secondary" : "outline"}
+            {/* --- Bouton Sélection --- */}
+            <Button
+                    variant={activeTool === 'select' ? "secondary" : "outline"}
                     size="sm"
-                    onClick={toggleDrawingMode}
-                 >
-                   {isDrawingMode ? 'Mode Sélection' : 'Stylo'}
-                 </Button>
-                <Button variant="outline" size="sm" onClick={addRectangle}>
-                    Ajouter Carré
+                    onClick={activateSelectMode}
+                >
+                Sélection
                 </Button>
+
+                {/* --- Menu Déroulant Stylo --- */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        {/* Le bouton a le style actif si l'outil est 'pen' */}
+                        <Button
+                            variant={activeTool === 'pen' ? "secondary" : "outline"}
+                            size="sm"
+                        >
+                            Stylo
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuLabel>Épaisseur</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {/* Les valeurs de width (1, 3, 8) sont des exemples, ajustez si besoin */}
+                        <DropdownMenuItem onSelect={() => activatePen(1)}>
+                            Fin (1px) {penWidth === 1 && activeTool === 'pen' && "✓"} {/* Indicateur actif */}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => activatePen(3)}>
+                            Moyen (3px) {penWidth === 3 && activeTool === 'pen' && "✓"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => activatePen(8)}>
+                            Épais (8px) {penWidth === 8 && activeTool === 'pen' && "✓"}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">Formes</Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        {/* <DropdownMenuLabel>Choisir une forme</DropdownMenuLabel> */}
+                        {/* <DropdownMenuSeparator /> */}
+                        <DropdownMenuItem onSelect={addRectangle}>
+                            Carré
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addCircle}>
+                            Rond
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addTriangle}>
+                            Triangle
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addLine}>
+                            Barre (Ligne)
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+
                 <Button variant="outline" size="sm" onClick={handleImageUploadClick}>
                     Importer Image
                 </Button>
