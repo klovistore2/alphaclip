@@ -82,7 +82,7 @@ const data = {
       items: [
         {
           title: "Scribble",
-          url: "/dashboard//image2image//scribble/",
+          url: "/dashboard//image2image//scribble/0",
         },
       ],
     },

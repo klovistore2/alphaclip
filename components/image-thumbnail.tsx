@@ -1,8 +1,10 @@
+// components/image-thumbnail.tsx
 "use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { MoreHorizontal, Maximize, Palette, Download } from "lucide-react"
+// Importer la nouvelle icône
+import { MoreHorizontal, Maximize, PencilLine, Download } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,13 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 
 interface ImageThumbnailProps {
   id: string
   url: string
-  title: string
+  // Modifier title pour accepter null, comme dans notre page galerie
+  title: string | null;
   lang: string
 }
 
@@ -26,27 +29,42 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
   const router = useRouter()
   const [showFullImage, setShowFullImage] = useState(false)
 
-  const openInPlayground = () => {
-    router.push(`/${lang}/p/playground-ai/${id}`)
+  // Renommer la fonction pour plus de clarté et Mettre à jour le chemin
+  const openInScribblePlayground = () => {
+    // Navigue vers la page Scribble en passant l'ID du dessin
+    router.push(`/${lang}/dashboard/image2image/scribble/${id}`)
   }
-
-
 
   const downloadImage = () => {
     const link = document.createElement("a")
     link.href = url
-    link.download = `${title.toLowerCase().replace(/\s+/g, "-")}.png`
+    // Utiliser un nom de fichier par défaut si title est null
+    const downloadTitle = title || `image-${id}`;
+    link.download = `${downloadTitle.toLowerCase().replace(/\s+/g, "-")}.png` // Ou autre extension si connue
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
+
+  // Utiliser un titre par défaut si null pour l'affichage
+  const displayTitle = title || "Sans titre";
 
   return (
     <>
       <Card className="overflow-hidden group relative">
         <CardContent className="p-0">
           <div className="relative aspect-video">
-            <Image src={url || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
+            {/* Utilise displayTitle pour l'attribut alt */}
+            <Image
+                src={url || "/placeholder.svg"}
+                alt={displayTitle}
+                // Remplacer layout="fill" par width/height si les dimensions sont connues ou souhaitées
+                // Ou garder fill mais s'assurer que le parent a une taille définie
+                width={400}
+                height={225} // exemple pour un ratio 16:9
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg?text=Error'; }}
+             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
               <DropdownMenu>
@@ -63,47 +81,63 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => setShowFullImage(true)}>
                     <Maximize className="mr-2 h-4 w-4" />
-                    <span>View full size</span>
+                    <span>Voir en grand</span> {/* Texte adapté */}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={openInPlayground}>
-                    <Palette className="mr-2 h-4 w-4" />
-                    <span>Open in Playground</span>
+                  {/* --- Modification ici --- */}
+                  <DropdownMenuItem onClick={openInScribblePlayground}>
+                    <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
+                    <span>Ouvrir dans Scribble</span> {/* Nouveau texte */}
                   </DropdownMenuItem>
+                  {/* --- Fin Modification --- */}
                   <DropdownMenuItem onClick={downloadImage}>
                     <Download className="mr-2 h-4 w-4" />
-                    <span>Download</span>
+                    <span>Télécharger</span> {/* Texte adapté */}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-
+                   {/* Ajoutez d'autres options si nécessaire */}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
         </CardContent>
-        <div className="p-3">
-          <h3 className="font-medium truncate">{title}</h3>
+        <div className="p-3 border-t"> {/* Ajout de border-t pour séparer */}
+           {/* Utilise displayTitle */}
+          <h3 className="font-medium truncate text-sm">{displayTitle}</h3>
         </div>
       </Card>
 
+      {/* Boîte de Dialogue (Dialog) */}
       <Dialog open={showFullImage} onOpenChange={setShowFullImage}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>
-              <div className="flex justify-between items-center mt-2">
-                <Button variant="outline" size="sm" onClick={openInPlayground}>
-                  <Palette className="mr-2 h-4 w-4" />
-                  Open in Playground
+             {/* Utilise displayTitle */}
+            <DialogTitle>{displayTitle}</DialogTitle>
+             {/* Description peut être retirée ou adaptée */}
+            {/* <DialogDescription> ... </DialogDescription> */}
+          </DialogHeader>
+          <div className="mt-4 flex justify-center max-h-[75vh] overflow-auto"> {/* Ajout de max-h et overflow */}
+             {/* Utilise displayTitle */}
+            <Image
+                src={url || "/placeholder.svg"}
+                alt={displayTitle}
+                width={1200} // Augmenter la taille pour le dialog
+                height={800}
+                className="object-contain rounded-md" // garder contain
+                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg?text=Error'; }}
+            />
+          </div>
+          {/* Déplacer les boutons dans DialogFooter pour une meilleure structure */}
+           <div className="flex justify-end items-center gap-2 mt-4 pt-4 border-t">
+                {/* --- Modification ici --- */}
+                <Button variant="outline" size="sm" onClick={openInScribblePlayground}>
+                    <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
+                    Ouvrir dans Scribble {/* Nouveau texte */}
                 </Button>
+                 {/* --- Fin Modification --- */}
                 <Button variant="outline" size="sm" onClick={downloadImage}>
                   <Download className="mr-2 h-4 w-4" />
-                  Download
+                  Télécharger {/* Texte adapté */}
                 </Button>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center">
-            <Image src={url || "/placeholder.svg"} alt={title} className="max-h-[70vh] object-contain rounded-md" />
           </div>
         </DialogContent>
       </Dialog>

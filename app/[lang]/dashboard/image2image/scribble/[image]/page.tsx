@@ -1,241 +1,206 @@
+// app/[lang]/dashboard/image2image/scribble/[image]/page.tsx
 import { Metadata } from "next"
 import Image from "next/image"
-import { Download, RotateCcw, Upload,  MoveHorizontal } from "lucide-react"
+//import { Download, RotateCcw, Upload, MoveHorizontal, PencilLine } from "lucide-react" // Ajout PencilLine pour cohérence
+import { PencilLine } from "lucide-react" // Ajout PencilLine pour cohérence
+import { notFound } from 'next/navigation'; // Pour la page 404
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
-import { ModelSelector } from "../components/model-selector"
-import { PresetActions } from "../components/preset-actions"
-import { PresetSelector } from "../components/preset-selector"
-import { PresetShare } from "../components/preset-share"
-import { models, types } from "../data/models"
-import { presets } from "../data/presets"
+//import { Slider } from "@/components/ui/slider"
+//import { Label } from "@/components/ui/label"
 
-import { getDictionary } from "@/app/[lang]/dictionaries" 
+// Conserver les imports même s'ils ne sont pas utilisés immédiatement
+// import { ModelSelector } from "../components/model-selector"
+// import { PresetActions } from "../components/preset-actions"
+// import { PresetSelector } from "../components/preset-selector"
+// import { PresetShare } from "../components/preset-share"
+// import { models, types } from "../data/models" // Assurez-vous que ces chemins sont corrects
+// import { presets } from "../data/presets" // Assurez-vous que ces chemins sont corrects
 
+// Import pour la langue (Localy) et dictionnaire (commenté pour l'instant)
+//import { getDictionary, Localy } from "@/app/[lang]/dictionaries"
+import { Localy } from "@/app/[lang]/dictionaries"
+// Importer Prisma, Auth et le type Drawing
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth"; // Assurez-vous que ce chemin est correct
+import type { Drawing } from "@prisma/client";
+
+// Métadonnées (peuvent être dynamiques si besoin)
 export const metadata: Metadata = {
-  title: "Image-to-Image",
-  description: "AI Image-to-Image Transformation Playground",
+  title: "Scribble Playground",
+  description: "AI Image Generation from Scribble/Drawing",
 }
 
 
-export default async function ImageToImagePlayground({
-  params,
+// --- Signature de fonction qui correspond à l'erreur de build ---
+export default async function ScribblePlaygroundPage({
+  params: paramsPromise // Renommer pour éviter conflit de nom avant await
 }: {
-  params: Promise<{ lang: 'en' | 'fr'; image?: string }>
+  // Typer la prop comme une Promesse contenant l'objet params
+  params: Promise<{
+      lang: Localy;
+      image: string; // ID du dessin
+  }>
 }) {
-  const { lang, image } = await params;
-  const imageParam = image || "default-image"; // Par exemple : "default-image"
+  // --- Résoudre la promesse params ---
+  const params = await paramsPromise;
+  const { lang, image: drawingId } = params; // Déstructurer l'objet résolu
+  // ------------------------------------
 
-  const dict = await getDictionary(lang); // Récupère le dictionnaire pour la langue
-  console.log("Image param:", imageParam); // Debug : Affiche le paramètre image
+  console.log("Language:", lang); // Log pour vérifier
+  const session = await auth();
+  const userId = session?.user?.id;
 
+  if (!userId) {
+      // Gérer l'utilisateur non connecté (ex: redirection ou message)
+      // Pour l'instant, on pourrait afficher un message simple ou rediriger
+       return (
+          <div className="container py-10">
+            <p>Veuillez vous connecter pour utiliser cette fonctionnalité.</p>
+            {/* Ajouter un bouton de connexion si nécessaire */}
+          </div>
+       );
+  }
+
+  // --- Récupérer le dessin spécifique ---
+  let drawing: Drawing | null = null;
+  try {
+      drawing = await prisma.drawing.findUnique({
+          where: {
+              id: drawingId,
+              userId: userId, // Sécurité: ne charge que les dessins de l'utilisateur
+          },
+      });
+  } catch (error) {
+      console.error("Error fetching drawing:", error);
+      // On pourrait afficher une page d'erreur ici
+  }
+
+  // Si dessin non trouvé ou n'appartient pas à l'utilisateur
+  if (!drawing) {
+      notFound(); // Affiche la page 404 par défaut de Next.js
+  }
+
+  // Si pas d'URL d'aperçu (même si peu probable après sauvegarde)
+  if (!drawing.previewUrl) {
+      return (
+          <div className="container py-10">
+             <p>Erreur : L aperçu pour ce dessin est manquant.</p>
+          </div>
+       );
+  }
+
+  // Titre par défaut si le titre du dessin est null
+  const displayTitle = drawing.title || "Dessin sans titre";
 
   return (
     <>
       <div className="md:hidden">
-        <p className="p-4 text-center">Please use a larger screen for the full Image-to-Image experience.</p>
+        <p className="p-4 text-center">Veuillez utiliser un écran plus large.</p>
       </div>
       <div className="hidden h-full flex-col md:flex">
+        {/* Header */}
         <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
-          <h2 className="text-lg font-semibold">Image-to-Image Playground {dict.create_image.title}</h2>
+          {/* Titre mis à jour */}
+          <h2 className="text-lg font-semibold flex items-center">
+            <PencilLine className="mr-2 h-5 w-5" /> {/* Icône ajoutée */}
+            Scribble Playground - {displayTitle}
+          </h2>
           <div className="ml-auto flex w-full space-x-2 sm:justify-end">
-            <PresetSelector presets={presets} />
-            <div className="hidden space-x-2 md:flex">
-              <PresetShare />
-            </div>
-            <PresetActions />
+            {/* Conserver les presets si utiles pour ce playground */}
+            {/* <PresetSelector presets={presets} />
+            <div className="hidden space-x-2 md:flex"> <PresetShare /> </div>
+            <PresetActions /> */}
           </div>
         </div>
         <Separator />
 
-        {/* Main Content */}
+        {/* Contenu Principal */}
         <div className="container h-full py-6">
-          {/* Two column layout for desktop: Top controls, bottom image comparison */}
           <div className="flex flex-col space-y-6">
-            {/* Top Section - Controls */}
+            {/* Section Contrôles Haut */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Image Upload Section */}
+
+              {/* Carte Image Source (Mise à jour) */}
               <Card className="col-span-1">
-                <CardContent className="p-4 space-y-4">
-                  <h3 className="text-lg font-medium">Source Image</h3>
-                  <div className="flex flex-col space-y-2">
-                    <Button className="w-full">
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Image
-                    </Button>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Supports JPG, PNG, WebP (Max 4MB)
-                    </p>
+                <CardContent className="p-4 space-y-2">
+                  <h3 className="text-lg font-medium">Dessin Source</h3>
+                  <div className="aspect-video bg-muted rounded-md overflow-hidden relative border">
+                       <Image
+                          src={drawing.previewUrl} // URL du dessin chargé
+                          alt={displayTitle}
+                          fill // Utilise fill pour remplir le conteneur
+                          style={{ objectFit: 'contain' }} // Assure que l'image est visible
+                          priority // Important pour LCP si cette image est grande et visible tôt
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Aide le navigateur à charger la bonne taille
+                      />
                   </div>
+                  {/* Pas besoin du bouton Upload ici */}
                 </CardContent>
               </Card>
 
-              {/* Prompt Input */}
+              {/* Carte Prompt (Inchangée pour l'instant) */}
               <Card className="col-span-1 lg:col-span-2">
                 <CardContent className="p-4 space-y-4">
-                  <h3 className="text-lg font-medium">Transformation Prompt</h3>
-                  <Textarea 
-                    placeholder="Describe how you want to transform the source image..." 
-                    className="min-h-[100px]"
+                  <h3 className="text-lg font-medium">Prompt de Transformation</h3>
+                  <Textarea
+                      id="prompt-input"
+                      placeholder="Décrivez l'image finale souhaitée (ex: 'Un chat photoréaliste assis sur un canapé')..."
+                      className="min-h-[100px]"
                   />
                   <div className="flex justify-end">
-                    <Button type="submit" className="w-full sm:w-auto">
-                      Transform Image
-                    </Button>
+                      <Button type="button" className="w-full sm:w-auto"> {/* type="button" si pas dans un <form> */}
+                          Générer l Image
+                      </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Model & Parameters Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="col-span-1">
-                <ModelSelector types={types} models={models} />
-              </div>
+            {/* Section Paramètres (Conserver les sliders si pertinents pour Scribble/ControlNet) */}
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"> ... </div> */}
 
-              {/* Transformation Strength */}
-              <div className="col-span-1 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="strength">Transformation Strength</Label>
-                    <span className="text-sm text-muted-foreground">0.75</span>
-                  </div>
-                  <Slider
-                    id="strength"
-                    max={1}
-                    step={0.05}
-                    defaultValue={[0.75]}
-                    className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Higher values produce more dramatic changes
-                  </p>
-                </div>
-              </div>
 
-              {/* Steps */}
-              <div className="col-span-1 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="steps">Sampling Steps</Label>
-                    <span className="text-sm text-muted-foreground">30</span>
-                  </div>
-                  <Slider
-                    id="steps"
-                    min={10}
-                    max={50}
-                    step={1}
-                    defaultValue={[30]}
-                    className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
-                  />
-                </div>
-              </div>
-
-              {/* Guidance Scale */}
-              <div className="col-span-1 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="guidance">Guidance Scale</Label>
-                    <span className="text-sm text-muted-foreground">7.5</span>
-                  </div>
-                  <Slider
-                    id="guidance"
-                    min={1}
-                    max={20}
-                    step={0.5}
-                    defaultValue={[7.5]}
-                    className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Image Comparison Section - Before & After */}
+            {/* Section Comparaison Image (Mise à jour Image Source) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Source Image - Left */}
+               {/* Rappel Image Source */}
               <div className="flex flex-col space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Source Image</h3>
-                </div>
-                <Card className="border border-dashed flex items-center justify-center rounded-lg overflow-hidden aspect-square">
-                  <CardContent className="p-0 w-full h-full flex items-center justify-center">
-                    <div className="text-center p-6">
-                      {/* Placeholder for source image */}
-                      <div className="flex flex-col items-center justify-center h-full space-y-2">
+                 <h3 className="text-lg font-medium">Dessin Source</h3>
+                 <Card className="border rounded-lg overflow-hidden aspect-square">
+                    <CardContent className="p-0 w-full h-full relative">
                         <Image
-                          src="/examples/placeholder-source.png" 
-                          width={400}
-                          height={400}
-                          alt="Source image will appear here"
-                          className="opacity-30"
+                            src={drawing.previewUrl}
+                            alt={displayTitle}
+                            fill
+                            style={{ objectFit: 'contain' }}
+                            sizes="(max-width: 768px) 100vw, 50vw"
                         />
-                        <p className="text-sm text-muted-foreground">Upload your source image</p>
-                      </div>
-                    </div>
-                  </CardContent>
+                    </CardContent>
                 </Card>
               </div>
 
-              {/* Result Image - Right */}
+              {/* Image Résultat (Placeholder) */}
               <div className="flex flex-col space-y-4">
+                {/* ... (Contenu placeholder inchangé pour l'instant) ... */}
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Transformed Image</h3>
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" disabled>
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                    <Button size="sm" variant="outline" disabled>
-                      <RotateCcw className="mr-2 h-4 w-4" />
-                      Regenerate
-                    </Button>
-                  </div>
+                  <h3 className="text-lg font-medium">Image Générée</h3>
+                  {/* ... boutons Download/Regenerate ... */}
                 </div>
                 <Card className="border border-dashed flex items-center justify-center rounded-lg overflow-hidden aspect-square">
                   <CardContent className="p-0 w-full h-full flex items-center justify-center">
                     <div className="text-center p-6">
-                      {/* Placeholder for transformed image */}
-                      <div className="flex flex-col items-center justify-center h-full space-y-2">
-                        <Image
-                          src="/examples/placeholder-result.png" 
-                          width={400}
-                          height={400}
-                          alt="Transformed image will appear here"
-                          className="opacity-30"
-                        />
-                        <p className="text-sm text-muted-foreground">Click Transform Image to start</p>
-                      </div>
+                       <p className="text-sm text-muted-foreground">L image générée apparaîtra ici.</p>
                     </div>
                   </CardContent>
                 </Card>
               </div>
             </div>
 
-            {/* Comparison Tools */}
-            <div className="flex items-center justify-center space-x-2">
-              <Button variant="outline" disabled>
-                <MoveHorizontal className="mr-2 h-4 w-4" />
-                Side-by-Side Comparison
-              </Button>
-            </div>
+            {/* ... Autres sections (Comparaison, Paramètres) ... */}
 
-            {/* Generation Parameters Display */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm font-medium mb-2">Last Generation Parameters</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-muted-foreground">
-                  <div><strong>Model:</strong> Stable Diffusion XL</div>
-                  <div><strong>Strength:</strong> 0.75</div>
-                  <div><strong>Steps:</strong> 30</div>
-                  <div><strong>CFG Scale:</strong> 7.5</div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
