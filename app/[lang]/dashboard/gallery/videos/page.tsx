@@ -1,18 +1,26 @@
 "use client";
-import { CldImage } from 'next-cloudinary';
 
-// By default, the CldImage component applies auto-format and auto-quality to all delivery URLs for optimized delivery.
-export default function Page() {
+import { CldImage } from "next-cloudinary";
+import Image from "next/image";
+
+export default function Try() {
   return (
-    <CldImage
-      alt="Sample image"
-      src="cld-sample-5" // Use this sample image or upload your own via the Media Explorer
-      width="500" // Transform the image: auto-crop to square aspect_ratio
-      height="500"
-      crop={{
-        type: 'auto',
-        source: true
-      }}
-    />
+    <div className="flex flex-col items-center gap-6">
+      {/* Image optimisée avec Cloudinary */}
+      <CldImage
+        alt="Logo"
+        src="cld-sample-5" // <-- ID public Cloudinary (vérifie bien dans Media Library)
+        width={400}
+        height={400}
+      />
+
+      {/* Fallback avec <Image /> et URL Cloudinary directe */}
+      <Image
+        src="https://res.cloudinary.com/dwgtpzjpw/image/upload/v1744578633/cld-sample-5.jpg"
+        alt="fallback"
+        width={400}
+        height={400}
+      />
+    </div>
   );
 }

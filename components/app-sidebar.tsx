@@ -81,24 +81,8 @@ const data = {
       icon: ImagePlus,
       items: [
         {
-          title: "Upscaler",
-          url: "/dashboard//image2image//upscaler/",
-        },
-        {
-          title: "Inpainting",
-          url: "/dashboard//image2image//inpainting/",
-        },
-        {
-          title: "Remove Background",
-          url: "/dashboard//image2image//playground3/0",
-        },
-        {
-          title: "Image Variations",
-          url: "#",
-        },
-        {
-          title: "Playground",
-          url: "/dashboard//image2image//playground2/",
+          title: "Scribble",
+          url: "/dashboard//image2image//scribble/",
         },
       ],
     },
@@ -198,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         
         <ModeToggle />
 
-        <NavUser user={data.user} />
+        <NavUser />
       
       </SidebarFooter>
       

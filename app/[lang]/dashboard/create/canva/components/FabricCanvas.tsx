@@ -15,12 +15,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 
+import { saveDrawingAction } from '@/lib/actions/drawingActions';
+
+// --- Helper Function pour convertir Data URL en File ---
+function dataURLtoFile(dataurl: string, filename: string): File | null {
+    const arr = dataurl.split(',');
+    if (!arr[0]) return null;
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch || !mimeMatch[1]) return null;
+    const mime = mimeMatch[1];
+    try {
+        const bstr = atob(arr[arr.length - 1]); // Décoder Base64
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, {type:mime});
+    } catch (error) {
+        console.error("Failed to decode base64 string:", error);
+        return null; // Gérer l'erreur de décodage
+    }
+}
+// ------------------------------------------------------
+
+
 const FabricCanvas = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [activeTool, setActiveTool] = useState<'select' | 'pen'>('select'); // Outil actif
-    const [penWidth, setPenWidth] = useState<number>(2); // Épaisseur actuelle du stylo
+   // --- States ---
+   const [activeTool, setActiveTool] = useState<'select' | 'pen'>('select');
+   const [penWidth, setPenWidth] = useState<number>(2);
+   const [isSaving, setIsSaving] = useState<boolean>(false);
+   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
     // --- Ajout d'une référence pour le conteneur du canvas ---
     const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -255,6 +283,42 @@ const handleImageUploadClick = () => {
         }
     };
 
+    // --- Fonction de Sauvegarde ---
+    const handleSave = async () => {
+        if (!fabricCanvasRef.current) {
+            setSaveMessage("Erreur : Le canevas n'est pas initialisé.");
+            return;
+        }
+        setIsSaving(true);
+        setSaveMessage("Sauvegarde en cours...");
+        try {
+            const canvas = fabricCanvasRef.current;
+            const imageDataUrl = canvas.toDataURL({ format: 'png', quality: 0.9 });
+            if (!imageDataUrl) throw new Error("Impossible de générer l'image.");
+
+            const filename = `drawing-${Date.now()}.png`;
+            const imageFile = dataURLtoFile(imageDataUrl, filename);
+            if (!imageFile) throw new Error("Impossible de créer le fichier image.");
+
+            const canvasState = JSON.stringify(canvas.toObject());
+
+            console.log("Calling saveDrawingAction...");
+            const result = await saveDrawingAction(imageFile, canvasState);
+
+            if (result?.success) {
+                 setSaveMessage("Dessin sauvegardé avec succès !");
+                 console.log("Save successful, ID:", result.drawingId);
+            } else {
+                 throw new Error(result?.error || "Erreur inconnue lors de la sauvegarde.");
+            }
+        } catch (error) {
+            console.error("Save failed:", error);
+            setSaveMessage(`Erreur : ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+            setIsSaving(false);
+            setTimeout(() => setSaveMessage(null), 5000);
+        }
+    };
 
     // --- Rendu du Composant ---
     return (
@@ -323,10 +387,23 @@ const handleImageUploadClick = () => {
                 <Button variant="outline" size="sm" onClick={handleImageUploadClick}>
                     Importer Image
                 </Button>
+
+
+
                 <Input
                     type="file" accept="image/*" ref={fileInputRef}
                     onChange={handleImageFileChange} className="hidden"
                 />
+
+
+                {/* Bouton Enregistrer */}
+                <Button variant="default" size="sm" onClick={handleSave} disabled={isSaving} > {isSaving ? "Sauvegarde..." : "Enregistrer"} </Button>
+
+                 {/* Message de sauvegarde */}
+                 {saveMessage && <span className="text-sm ml-2 text-muted-foreground">{saveMessage}</span>}
+
+
+
             </div>
 
             {/* Conteneur DU CANEVAS (celui qu'on modifie) */}

@@ -32,11 +32,10 @@ export function middleware(request: NextRequest) {
   // The new URL is now /en-US/products
   return NextResponse.redirect(request.nextUrl);
 }
-
 export const config = {
   matcher: [
-    // Skip all internal paths (_next)
-    '/((?!_next).*)',
+    // Skip all internal paths (_next) and API routes (/api)
+    '/((?!_next|api).*)',
     // Optional: only run on root (/) URL
     '/',
   ],
