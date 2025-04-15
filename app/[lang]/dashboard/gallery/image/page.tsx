@@ -1,165 +1,197 @@
 // app/[lang]/dashboard/gallery/image/page.tsx
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { ImageThumbnail } from "@/components/image-thumbnail"
-// --- Importer les composants Accordion ---
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-// --- Importer Prisma et Auth ---
-import { prisma } from "@/lib/prisma"; // Vérifiez le chemin
-import { auth } from "@/lib/auth";   // Vérifiez le chemin
-import type { Drawing } from "@prisma/client"; // Importer le type Drawing si besoin
-
-// Type pour la langue (à ajuster si nécessaire)
-type Language = 'en' | 'fr';
-
-// --- Fonction pour récupérer les dessins de l'utilisateur ---
-async function getUserDrawings(userId: string): Promise<Drawing[]> {
-  if (!userId) {
-      return []; // Retourne un tableau vide si pas d'ID utilisateur
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+  } from "@/components/ui/breadcrumb"
+  import { Separator } from "@/components/ui/separator"
+  import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+  import { ImageThumbnail } from "@/components/image-thumbnailGenerated"
+  import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+  } from "@/components/ui/accordion"
+  import { prisma } from "@/lib/prisma";
+  import { auth } from "@/lib/auth";
+  // Importer les deux types
+  import type { Drawing, GeneratedImage } from "@prisma/client";
+  
+  type Language = 'en' | 'fr';
+  
+  // --- Fonction pour récupérer les dessins ---
+  async function getUserDrawings(userId: string): Promise<Drawing[]> {
+    if (!userId) return [];
+    try {
+        const drawings = await prisma.drawing.findMany({
+            where: { userId: userId, isDeleted: false },
+            orderBy: { createdAt: 'desc' },
+        });
+        return drawings;
+    } catch (error) {
+        console.error("Failed to fetch user drawings:", error);
+        return [];
+    }
   }
-  try {
-      const drawings = await prisma.drawing.findMany({
-          where: {
-              userId: userId,
-              isDeleted: false, // Optionnel: ne pas afficher les "supprimés"
-          },
-          orderBy: {
-              createdAt: 'desc', // Afficher les plus récents en premier
-          },
-          // Select seulement les champs nécessaires si besoin d'optimiser
-          // select: { id: true, title: true, previewUrl: true, createdAt: true }
-      });
-      return drawings;
-  } catch (error) {
-      console.error("Failed to fetch user drawings:", error);
-      return []; // Retourne un tableau vide en cas d'erreur
+  
+  // --- Fonction pour récupérer les images générées ---
+  async function getUserGeneratedImages(userId: string): Promise<GeneratedImage[]> {
+      if (!userId) return [];
+      try {
+          const generatedImages = await prisma.generatedImage.findMany({
+              where: { userId: userId, isDeleted: false },
+              orderBy: { createdAt: 'desc' },
+              // --- Correction : Clause SELECT supprimée ---
+              // select: { ... } // Supprimé pour retourner l'objet complet
+          });
+          return generatedImages; // Retourne maintenant des objets GeneratedImage complets
+      } catch (error) {
+          console.error("Failed to fetch user generated images:", error);
+          return [];
+      }
   }
-}
-
-
+ 
 export default async function GalleryPage({ // Renommé de HistoryPage à GalleryPage pour plus de clarté
-  params,
-}: {
-  params: Promise<{ lang: Language }>
-}) {
 
-  const { lang } = await params;
+    params,
+    
+    }: {
+    
+    params: Promise<{ lang: Language }>
+    
+    }) {
+    
+    
+    
+    const { lang } = await params;
+  
+      const session = await auth();
+      const userId = session?.user?.id;
+  
+      // --- Correction : Récupérer les deux types de données et les assigner ---
+      let drawings: Drawing[] = [];
+      let generatedImages: GeneratedImage[] = []; // Déclarer la variable ici
+  
+      if (userId) {
+          // Utiliser Promise.all pour les requêtes parallèles
+          try {
+              [drawings, generatedImages] = await Promise.all([
+                  getUserDrawings(userId),
+                  getUserGeneratedImages(userId)
+              ]);
+          } catch (error) {
+              console.error("Error fetching gallery data:", error);
+              // Gérer l'erreur de fetch global si nécessaire
+          }
+      } else {
+          console.warn("User not logged in, cannot fetch data.");
+      }
+      // ---------------------------------------------------------------------
+  
+      return (
+        <SidebarInset>
+            {/* Header */}
+            <header className="flex h-16 shrink-0 items-center justify-between">
+                 <div className="flex items-center gap-2 px-4">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="mr-2 h-4" />
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem className="hidden md:block"> <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink> </BreadcrumbItem>
+                            <BreadcrumbSeparator className="hidden md:block" />
+                            <BreadcrumbItem> <BreadcrumbPage>Galerie</BreadcrumbPage> </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </div>
+            </header>
+  
+            {/* Contenu Principal */}
+            <div className="flex flex-1 flex-col p-6">
+                <div className="mx-auto w-full max-w-6xl space-y-6">
+                    {/* Titre */}
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Galerie</h1>
+                        <p className="text-muted-foreground">Vos créations et images générées.</p>
+                    </div>
+  
+                    {/* Accordéon principal */}
+                    {/* 'defaultValue' peut être un tableau si type="multiple" */}
+                    <Accordion type="multiple" defaultValue={['item-drawings', 'item-generated-images']} className="w-full space-y-4">
+  
+                        {/* --- Section Dessins --- */}
+                        <AccordionItem value="item-drawings">
+                            <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
+                                Mes Dessins ({drawings.length})
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-4">
+                                {drawings.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {drawings.map((drawing) => ( /* ... mapping des dessins ... */
+                                            drawing.previewUrl ? (
+                                                <ImageThumbnail key={drawing.id} id={drawing.id} url={drawing.previewUrl} title={drawing.title} lang={lang} />
+                                            ) : (
+                                                <div key={drawing.id} className="aspect-video bg-muted ..."> Preview indisponible ... </div>
+                                            )
+                                        ))}
+                                    </div>
+                                ) : (
 
-  // --- Récupérer la session et l'ID utilisateur ---
-  const session = await auth();
-  const userId = session?.user?.id;
+                                    // Message si aucun dessin n'est trouvé
+                                    
+                                    <p className="text-muted-foreground pt-4">
+                                    
+                                    {userId ? "Vous n'avez pas encore de dessins enregistrés." : "Connectez-vous pour voir vos dessins."}
+                                    
+                                    </p>
+                                    
+                                    )}
+                            </AccordionContent>
+                        </AccordionItem>
+  
+                        {/* --- Section Images Générées --- */}
+                        <AccordionItem value="item-generated-images">
+                             {/* Utilisation de la variable 'generatedImages' maintenant déclarée */}
+                             <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
+                                Mes Images Générées ({generatedImages.length})
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-4">
+                                {generatedImages.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {generatedImages.map((image) => ( /* ... mapping des images générées ... */
+                                            image.imageUrl ? (
+                                                <ImageThumbnail
+                                                    key={image.id}
+                                                    id={image.id}
+                                                    url={image.imageUrl}
+                                                    title={image.prompt ? (image.prompt.length > 50 ? image.prompt.substring(0, 47) + "..." : image.prompt) : (image.modelUsed || "Image générée")}
+                                                    lang={lang}
+                                                />
+                                            ) : (
+                                                 <div key={image.id} className="aspect-video bg-muted ..."> Image indisponible </div>
+                                            )
+                                        ))}
+                                    </div>
+                                ) : (
 
-  // --- Récupérer les dessins ---
-  let drawings: Drawing[] = [];
-  if (userId) {
-      drawings = await getUserDrawings(userId);
-  } else {
-      // Gérer le cas non connecté ? Redirection ? Message ?
-      // Pour l'instant, on affiche juste la page vide si pas connecté.
-      console.warn("User not logged in, cannot fetch drawings.");
+                                    // Message si aucun dessin n'est trouvé
+                                    
+                                    <p className="text-muted-foreground pt-4">
+                                    
+                                    {userId ? "Vous n'avez pas encore généré d'images." : "Connectez-vous pour voir vos dessins."}
+                                    
+                                    </p>
+                                    
+                                    )}
+                            </AccordionContent>
+                        </AccordionItem>
+  
+                    </Accordion>
+                </div>
+            </div>
+        </SidebarInset>
+    )
   }
-
-  return (
-      <SidebarInset>
-          {/* Header (peut être adapté) */}
-          <header className="flex h-16 shrink-0 items-center justify-between">
-               {/* ... Contenu du header existant ... */}
-               <div className="flex items-center gap-2 px-4">
-                  <SidebarTrigger className="-ml-1" />
-                  <Separator orientation="vertical" className="mr-2 h-4" />
-                  <Breadcrumb>
-                      <BreadcrumbList>
-                          <BreadcrumbItem className="hidden md:block">
-                              <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink> {/* Lien adapté */}
-                          </BreadcrumbItem>
-                          <BreadcrumbSeparator className="hidden md:block" />
-                          <BreadcrumbItem>
-                              <BreadcrumbPage>Galerie</BreadcrumbPage> {/* Nom adapté */}
-                          </BreadcrumbItem>
-                      </BreadcrumbList>
-                  </Breadcrumb>
-              </div>
-          </header>
-
-          {/* Contenu Principal */}
-          <div className="flex flex-1 flex-col p-6">
-              <div className="mx-auto w-full max-w-6xl space-y-6">
-                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <div>
-                          {/* Titre de la page */}
-                          <h1 className="text-3xl font-bold tracking-tight">Galerie</h1>
-                          <p className="text-muted-foreground">Vos créations et images générées.</p>
-                      </div>
-                  </div>
-
-                  {/* --- Section Accordéon pour les dessins --- */}
-                  <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
-                      <AccordionItem value="item-1">
-                          <AccordionTrigger className="text-xl font-semibold">
-                              Mes Dessins ({drawings.length}) {/* Affiche le nombre de dessins */}
-                          </AccordionTrigger>
-                          <AccordionContent>
-                              {drawings.length > 0 ? (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
-                                      {drawings.map((drawing) => (
-                                          // Vérifie si previewUrl existe avant d'afficher
-                                          drawing.previewUrl ? (
-                                              <ImageThumbnail
-                                                  key={drawing.id}
-                                                  id={drawing.id}
-                                                  // Utilise previewUrl comme source de l'image
-                                                  url={drawing.previewUrl}
-                                                  // Utilise le titre du dessin ou un placeholder
-                                                  title={drawing.title || "Dessin sans titre"}
-                                                  lang={lang}
-                                                  // On pourrait ajouter d'autres infos ici plus tard (date, etc.)
-                                                  // Ou un lien vers une page de détail/édition
-                                              />
-                                          ) : (
-                                              // Optionnel: Afficher un placeholder si pas de preview
-                                              <div key={drawing.id} className="aspect-video bg-muted rounded-md flex items-center justify-center text-sm text-muted-foreground">
-                                                 Preview indisponible <br/> ({drawing.title || "Dessin sans titre"})
-                                              </div>
-                                          )
-                                      ))}
-                                  </div>
-                              ) : (
-                                  // Message si aucun dessin n'est trouvé
-                                  <p className="text-muted-foreground pt-4">
-                                      {userId ? "Vous n'avez pas encore de dessins enregistrés." : "Connectez-vous pour voir vos dessins."}
-                                  </p>
-                              )}
-                          </AccordionContent>
-                      </AccordionItem>
-                      {/* --- Fin Section Accordéon Dessins --- */}
-
-
-                      {/* --- Vous pourrez ajouter d'autres AccordionItem ici --- */}
-                      {/* Exemple:
-                      <AccordionItem value="item-2">
-                          <AccordionTrigger>Mes Images Générées (IA)</AccordionTrigger>
-                          <AccordionContent>
-                              Contenu pour les images générées...
-                          </AccordionContent>
-                      </AccordionItem>
-                      */}
-
-                  </Accordion>
-              </div>
-          </div>
-      </SidebarInset>
-  )
-}

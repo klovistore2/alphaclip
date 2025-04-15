@@ -124,7 +124,7 @@ model GeneratedImage {
   replicatePredictionId String? @unique // ID de la tâche Replicate (si applicable)
   createdAt   DateTime  @default(now())
   isDeleted   Boolean   @default(false)
-
+  title       String?  // Titre de la vidéo (optionnel)
   // Relation avec l'utilisateur
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

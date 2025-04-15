@@ -1,0 +1,207 @@
+// lib/actions/variationActions.ts
+'use server';
+
+import { GoogleGenAI, Modality } from "@google/genai";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configuration Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Interfaces pour l'action
+interface GenerateVariationParams {
+  sourceImageId: string;
+  prompt: string;
+}
+
+interface GenerateVariationResult {
+  success: boolean;
+  outputUrls?: string[];
+  error?: string;
+  modelUsed?: string;
+  generatedImageId?: string;
+}
+
+export async function generateImageVariationAction(
+  params: GenerateVariationParams
+): Promise<GenerateVariationResult> {
+  console.log("Server Action: generateImageVariationAction invoked");
+
+  // 1. Authentification
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    console.error("Server Action Error: User not authenticated");
+    return { success: false, error: "Utilisateur non authentifi�." };
+  }
+  console.log("Server Action: User authenticated:", userId);
+
+  // 2. Validation des pr�requis et param�tres
+  if (!process.env.GEMINI_API_KEY) {
+    console.error("Server Action Error: GEMINI_API_KEY not set.");
+    return { success: false, error: "Configuration serveur incompl�te (cl� API Gemini manquante)." };
+  }
+  if (!params.sourceImageId || !params.prompt) {
+    console.error("Server Action Error: Missing required parameters.");
+    return { success: false, error: "Param�tres manquants (image source ou prompt)." };
+  }
+
+  try {
+    // 3. R�cup�rer l'image source depuis la base de donn�es
+    const sourceImage = await prisma.generatedImage.findUnique({
+      where: { id: params.sourceImageId }
+    });
+
+    if (!sourceImage || !sourceImage.imageUrl) {
+      console.error("Server Action Error: Source image not found or has no URL");
+      return { success: false, error: "Image source introuvable ou URL manquante." };
+    }
+
+    console.log("Server Action: Source image found:", sourceImage.imageUrl);
+
+    // 4. T�l�charger l'image depuis Cloudinary et la convertir en base64
+    const imageResponse = await fetch(sourceImage.imageUrl);
+    if (!imageResponse.ok) {
+      console.error("Server Action Error: Failed to fetch source image from URL");
+      return { success: false, error: "Impossible de t�l�charger l'image source." };
+    }
+
+    // Convertir en ArrayBuffer puis en Base64
+    const imageArrayBuffer = await imageResponse.arrayBuffer();
+    const base64Image = Buffer.from(imageArrayBuffer).toString('base64');
+    
+    // 5. Appeler l'API Gemini pour g�n�rer la variation
+    console.log("Server Action: Calling Gemini API with prompt:", params.prompt);
+    
+    // Initialiser le client Gemini
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    
+    // Pr�parer le contenu
+    const contents = [
+      { text: params.prompt },
+      {
+        inlineData: {
+          mimeType: imageResponse.headers.get('content-type') || 'image/png',
+          data: base64Image,
+        },
+      },
+    ];
+
+    // Appeler l'API Gemini
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.0-flash-exp-image-generation",
+      contents: contents,
+      config: {
+        responseModalities: [Modality.TEXT, Modality.IMAGE],
+      },
+    });
+
+    console.log("Server Action: Gemini API response received");
+    
+    // 6. Extraire et traiter l'image g�n�r�e
+    const outputUrls: string[] = [];
+    let resultText = "";
+    
+    for (const part of response.candidates[0].content.parts) {
+      if (part.text) {
+        console.log("Server Action: Gemini text response:", part.text);
+        resultText = part.text;
+      } else if (part.inlineData) {
+        console.log("Server Action: Gemini returned an image");
+        const imageData = part.inlineData.data;
+        
+        // T�l�charger l'image sur Cloudinary
+        try {
+          console.log("Server Action: Uploading generated image to Cloudinary...");
+          const cloudinaryResult = await cloudinary.uploader.upload(
+            `data:${part.inlineData.mimeType};base64,${imageData}`,
+            {
+              folder: 'variations',
+              resource_type: 'image',
+            }
+          );
+          
+          outputUrls.push(cloudinaryResult.secure_url);
+          console.log("Server Action: Cloudinary upload successful:", cloudinaryResult.secure_url);
+        } catch (cloudinaryError) {
+          console.error("Server Action Error: Cloudinary upload failed:", cloudinaryError);
+          return { 
+            success: false, 
+            error: "L'image a �t� g�n�r�e mais n'a pas pu �tre enregistr�e sur Cloudinary." 
+          };
+        }
+      }
+    }
+
+    if (outputUrls.length === 0) {
+      console.error("Server Action Error: No image generated by Gemini");
+      return { success: false, error: "Gemini n'a pas g�n�r� d'image." };
+    }
+
+    // 7. Enregistrer l'image g�n�r�e dans la base de donn�es
+    try {
+      const generatedImage = await prisma.generatedImage.create({
+        data: {
+          imageUrl: outputUrls[0],
+          prompt: params.prompt,
+          modelUsed: "gemini-2.0-flash-exp-image-generation",
+          status: "COMPLETED",
+          parameters: {
+            sourceImageId: params.sourceImageId,
+            resultText: resultText,
+          },
+          // Relations
+          userId: userId,
+          sourceImageId: params.sourceImageId, // Source = GeneratedImage
+        }
+      });
+      
+      console.log("Server Action: Variation saved to database with ID:", generatedImage.id);
+      
+      // 8. Cr�er un log de g�n�ration
+      await prisma.generationLog.create({
+        data: {
+          type: "IMAGE_VARIATION",
+          prompt: params.prompt,
+          modelUsed: "gemini-2.0-flash-exp-image-generation",
+          parameters: {
+            sourceImageId: params.sourceImageId,
+            resultText: resultText,
+          },
+          status: "COMPLETED",
+          resultUrl: outputUrls[0],
+          userId: userId,
+          sourceImageId: params.sourceImageId,
+          completedAt: new Date()
+        }
+      });
+      
+      return {
+        success: true,
+        outputUrls: outputUrls,
+        modelUsed: "gemini-2.0-flash-exp-image-generation",
+        generatedImageId: generatedImage.id
+      };
+    } catch (dbError) {
+      console.error("Server Action Error: Failed to save to database:", dbError);
+      // On renvoie quand m�me l'URL
+      return {
+        success: true,
+        outputUrls: outputUrls,
+        modelUsed: "gemini-2.0-flash-exp-image-generation",
+        error: "Image g�n�r�e mais erreur lors de l'enregistrement en base de donn�es."
+      };
+    }
+  } catch (error) {
+    console.error("Server Action Error: Gemini API call failed:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Une erreur est survenue lors de l'appel � l'API Gemini."
+    };
+  }
+}
