@@ -10,15 +10,18 @@ import { Separator } from "@/components/ui/separator"
 //} from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+
 import { ModelSelector } from "./components/model-selector"
-import { PresetActions } from "./components/preset-actions"
+import { PresetActions} from "./components/preset-actions"
 import { PresetSelector } from "./components/preset-selector"
 import { PresetShare } from "./components/preset-share"
 import { TemperatureSelector } from "./components/temperature-selector"
 import { TopPSelector } from "./components/top-p-selector"
+import { MaxLengthSelector } from "./components/maxlength-selector"
+
 import { models, types } from "./data/models"
 import { presets } from "./data/presets"
-import { MaxLengthSelector } from "./components/maxlength-selector"
+
 
 export const metadata: Metadata = {
   title: "Image Generator",

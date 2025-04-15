@@ -11,7 +11,7 @@ import {
   Map,
   PieChart,
   Film,
-  Music,
+  //Music,
 
 } from "lucide-react"
 
@@ -54,10 +54,6 @@ const data = {
           title: "Video",
           url: "/dashboard//gallery//videos",
         },
-        {
-          title: "Sound",
-          url: "#",
-        },
       ],
     },
     {
@@ -65,14 +61,12 @@ const data = {
       url: "#",
       icon: Pencil,
       items: [
-        {
-          title: "Text to Image",
-          url: "/dashboard//create//text2image",
-        },
+
         {
           title: "Canva",
           url: "/dashboard//create//canva",
         },
+
       ],
     },
     {
@@ -82,7 +76,11 @@ const data = {
       items: [
         {
           title: "Scribble",
-          url: "/dashboard//image2image//scribble/0",
+          url: "/dashboard//image2image//scribble//0",
+        },
+        {
+          title: "Variationa",
+          url: "/dashboard//image2image//variation//0",
         },
       ],
     },
@@ -95,10 +93,6 @@ const data = {
           title: "Image to Video",
           url: "/dashboard//videogenerate//image2video//0",
         },
-        {
-          title: "Text to Video",
-          url: "#",
-        },
       ],
     },
     {
@@ -106,43 +100,18 @@ const data = {
       url: "#",
       icon: Film,
       items: [
-        {
-          title: "LipSync",
-          url: "#",
-        },
-        {
-          title: "Make It longer",
-          url: "#",
-        },
+
         {
           title: "Add AI Sound",
-          url: "#",
+          url: "/dashboard//improvevideo//addsound//0",
         },
         {
-          title: "Compress / format",
-          url: "#",
+          title: "Make it longer",
+          url: "/dashboard//improvevideo//extend//0",
         },
       ],
     },
-    {
-      title: "Generate Sound",
-      url: "#",
-      icon: Music,
-      items: [
-        {
-          title: "Voice talking",
-          url: "#",
-        },
-        {
-          title: "AI Music",
-          url: "#",
-        },
-        {
-          title: "Add Sound",
-          url: "#",
-        },
-      ],
-    },
+    
   ],
   projects: [
     {
