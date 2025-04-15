@@ -93,7 +93,7 @@ const data = {
       items: [
         {
           title: "Image to Video",
-          url: "#",
+          url: "/dashboard//videogenerate//image2video//0",
         },
         {
           title: "Text to Video",

@@ -35,6 +35,11 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
     router.push(`/${lang}/dashboard/image2image/variation/${id}`)
   }
 
+  const openInVideoPlayground = () => {
+    // Navigue vers la page Scribble en passant l'ID du dessin
+    router.push(`/${lang}/dashboard/videogenerate/image2video/${id}`)
+  }
+
   const downloadImage = () => {
     const link = document.createElement("a")
     link.href = url
@@ -88,6 +93,10 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
                     <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
                     <span>Ouvrir dans Variation</span> {/* Nouveau texte */}
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={openInVideoPlayground}>
+                    <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
+                    <span>Ouvrir dans Image2video</span> {/* Nouveau texte */}
+                  </DropdownMenuItem>
                   {/* --- Fin Modification --- */}
                   <DropdownMenuItem onClick={downloadImage}>
                     <Download className="mr-2 h-4 w-4" />
@@ -133,6 +142,12 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
                     <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
                     Ouvrir dans Variation {/* Nouveau texte */}
                 </Button>
+
+                <Button variant="outline" size="sm" onClick={openInVideoPlayground}>
+                    <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
+                    Ouvrir dans Image2Video {/* Nouveau texte */}
+                </Button>
+
                  {/* --- Fin Modification --- */}
                 <Button variant="outline" size="sm" onClick={downloadImage}>
                   <Download className="mr-2 h-4 w-4" />

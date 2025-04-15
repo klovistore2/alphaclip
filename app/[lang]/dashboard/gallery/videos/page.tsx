@@ -1,26 +1,19 @@
-"use client";
+import { Suspense } from 'react';
+import { SidebarInset } from "@/components/ui/sidebar";
+import { Loader2 } from "lucide-react";
+import VideoGallery from './video-gallery';
 
-import { CldImage } from "next-cloudinary";
-import Image from "next/image";
-
-export default function Try() {
+export default function VideosGalleryPage() {
   return (
-    <div className="flex flex-col items-center gap-6">
-      {/* Image optimisée avec Cloudinary */}
-      <CldImage
-        alt="Logo"
-        src="cld-sample-5" // <-- ID public Cloudinary (vérifie bien dans Media Library)
-        width={400}
-        height={400}
-      />
-
-      {/* Fallback avec <Image /> et URL Cloudinary directe */}
-      <Image
-        src="https://res.cloudinary.com/dwgtpzjpw/image/upload/v1744578633/cld-sample-5.jpg"
-        alt="fallback"
-        width={400}
-        height={400}
-      />
-    </div>
+    <SidebarInset>
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-screen">
+          <Loader2 className="h-8 w-8 animate-spin mr-2" />
+          <span>Chargement de la galerie...</span>
+        </div>
+      }>
+        <VideoGallery />
+      </Suspense>
+    </SidebarInset>
   );
 }
