@@ -177,6 +177,7 @@ model GeneratedVideo {
 
   // Relation avec l'audio généré (si applicable)
   generatedAudio GeneratedAudio? // Assurez-vous que ce modèle existe si vous le référencez
+  sound     Boolean      @default(false) // la video a-t-elle un son ?
 
   // --- AJOUTS pour la relation Parent/Enfant ---
   parentVideoId String?      // Clé étrangère vers la vidéo parente (optionnelle)
