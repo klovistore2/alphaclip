@@ -150,35 +150,47 @@ model GeneratedImage {
 
 // Représente une vidéo générée par IA (depuis une image)
 model GeneratedVideo {
-  id          String   @id @default(cuid())
-  videoUrl    String   // URL de la vidéo stockée
-  duration    Float?   // Durée en secondes
-  prompt      String?  @db.Text // Prompt utilisé
-  modelUsed   String?  // Modèle IA utilisé (ex: 'stable-video-diffusion')
-  parameters  Json?    // Paramètres IA
-  status      AssetStatus @default(PENDING) // Statut de génération (PENDING, PROCESSING, COMPLETED, FAILED)
-  replicatePredictionId String? @unique // ID de la tâche Replicate
-  createdAt   DateTime @default(now())
-  isDeleted   Boolean  @default(false)
-  public      Boolean  @default(false) // Indique si la vidéo est publique ou non
-  title       String?  // Titre de la vidéo (optionnel)
-  description String?  // Description de la vidéo (optionnelle)
+  id                    String       @id @default(cuid())
+  cloudinaryPublicId    String?      // ID Public Cloudinary
+  videoUrl              String?      // URL de la vidéo stockée (devrait être optionnel '?' si statut PENDING/FAILED)
+  duration              Float?       // Durée en secondes
+  prompt                String?      @db.Text // Prompt utilisé (pour image2video ou sound)
+  modelUsed             String?      // Modèle IA utilisé
+  parameters            Json?        // Paramètres IA divers (peut encore être utile pour d'autres choses)
+  status                AssetStatus  @default(PENDING)
+  replicatePredictionId String?      @unique
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt // Ajouter la date de mise à jour
+  isDeleted             Boolean      @default(false)
+  public                Boolean      @default(false)
+  title                 String?
+  description           String?
+
   // Relation avec l'utilisateur
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relation avec l'image source
-  sourceImageId String
-  sourceImage   GeneratedImage @relation(fields: [sourceImageId], references: [id], onDelete: Cascade) // Si l'image source est supprimée, la vidéo l'est aussi ? A définir. Cascade peut être dangereux. 'Restrict' ou 'SetNull' + logique applicative sont plus sûrs. Pour l'instant Cascade pour simplicité.
+  // Relation avec l'image source (si applicable)
+  // Rendre optionnel si une vidéo peut exister sans image source (ex: text2video)
+  sourceImageId String? // << Rendu optionnel ?
+  sourceImage   GeneratedImage? @relation(fields: [sourceImageId], references: [id], onDelete: SetNull) // << Changé onDelete en SetNull
 
-  // Relation avec l'audio généré (si un seul audio par vidéo)
-  generatedAudio GeneratedAudio?
-  generationLogs GenerationLog[]
+  // Relation avec l'audio généré (si applicable)
+  generatedAudio GeneratedAudio? // Assurez-vous que ce modèle existe si vous le référencez
+
+  // --- AJOUTS pour la relation Parent/Enfant ---
+  parentVideoId String?      // Clé étrangère vers la vidéo parente (optionnelle)
+  parentVideo   GeneratedVideo? @relation("VideoEdits", fields: [parentVideoId], references: [id], onDelete: SetNull) // Relation vers le parent (nommée "VideoEdits")
+  childVideos   GeneratedVideo[] @relation("VideoEdits") // Relation vers les enfants (vidéos dérivées)
+
+  // Relation avec les logs
+  generationLogs GenerationLog[] // Assurez-vous que GenerationLog existe
 
   @@index([userId])
   @@index([status])
   @@index([sourceImageId])
   @@index([isDeleted])
+  @@index([parentVideoId]) // << Index ajouté pour la nouvelle clé étrangère
 }
 
 // Représente un audio généré par IA (pour une vidéo)
@@ -235,7 +247,7 @@ model GenerationLog {
 
   sourceVideoId String?
   sourceVideo   GeneratedVideo? @relation(fields: [sourceVideoId], references: [id], onDelete: SetNull)
-
+  generatedVideoId String?
   sourceAudioId String?
   sourceAudio   GeneratedAudio? @relation(fields: [sourceAudioId], references: [id], onDelete: SetNull)
 

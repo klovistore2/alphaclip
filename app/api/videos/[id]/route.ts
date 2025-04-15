@@ -35,7 +35,8 @@ export async function GET(
         createdAt: true,
         parameters: true,
         modelUsed: true,
-        sourceImageId: true
+        sourceImageId: true,
+        cloudinaryPublicId: true,
       }
     });
 
@@ -57,7 +58,7 @@ export async function GET(
     } else if (!title) {
       title = "Vidéo générée";
     }
-
+    console.log("Titre de la vidéo :", title); // Pour le débogage
     // 6. Retourner les données
     return NextResponse.json({
       ...video,

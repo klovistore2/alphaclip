@@ -83,7 +83,7 @@ export async function generateImageVariationAction(
     
     // Pr�parer le contenu
     const contents = [
-      { text: params.prompt },
+      { text: "only generate an image :" +params.prompt },
       {
         inlineData: {
           mimeType: imageResponse.headers.get('content-type') || 'image/png',

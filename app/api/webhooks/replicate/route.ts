@@ -11,23 +11,42 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-async function downloadAndUploadToCloudinary(url: string): Promise<string> {
+// Interface pour définir la structure de retour
+interface CloudinaryUploadResult {
+  secure_url: string;
+  public_id: string;
+}
+
+
+
+// Modifiez la signature de retour de la fonction pour retourner l'objet
+async function downloadAndUploadToCloudinary(url: string): Promise<CloudinaryUploadResult> {
   console.log('[WEBHOOK] Uploading video to Cloudinary from:', url);
-  
+
   try {
-    // Upload directement depuis l'URL de Replicate vers Cloudinary
     const result = await cloudinary.uploader.upload(url, {
       resource_type: 'video',
-      folder: 'generated_videos',
+      folder: 'generated_videos', // Vous pouvez aussi spécifier un public_id si vous le souhaitez
+      // Par exemple: public_id: `video_${Date.now()}`
     });
-    
-    console.log('[WEBHOOK] Cloudinary upload successful:', result.secure_url);
-    return result.secure_url;
+
+    console.log('[WEBHOOK] Cloudinary upload successful:', result.secure_url, 'Public ID:', result.public_id);
+
+    // Retourner l'URL sécurisée ET l'ID public
+    return {
+      secure_url: result.secure_url,
+      public_id: result.public_id
+    };
   } catch (error) {
     console.error('[WEBHOOK] Cloudinary upload failed:', error);
-    throw error;
+    throw error; // Propage l'erreur pour être gérée plus haut
   }
 }
+
+
+
+
+
 
 export async function POST(req: Request) {
   try {
@@ -89,6 +108,8 @@ export async function POST(req: Request) {
 
     // Process video if generation succeeded
     let videoUrl: string | null = null;
+    let cloudinaryPublicId: string | null = null; // Variable pour stocker le public_id
+
     let videoData = {};
     
     if (newStatus === AssetStatus.COMPLETED && event.output) {
@@ -121,7 +142,11 @@ export async function POST(req: Request) {
         console.log('[WEBHOOK] Identified video source URL:', videoSourceUrl);
 
         // Upload à Cloudinary
-        videoUrl = await downloadAndUploadToCloudinary(videoSourceUrl);
+        // Upload à Cloudinary et récupération du résultat complet
+        const cloudinaryResult = await downloadAndUploadToCloudinary(videoSourceUrl);
+        videoUrl = cloudinaryResult.secure_url;
+        cloudinaryPublicId = cloudinaryResult.public_id; // Récupérer le public_id
+        
         
         // Stocker d'autres métadonnées si disponibles
         const videoParams = typeof video.parameters === 'object' && video.parameters !== null 
@@ -181,6 +206,7 @@ export async function POST(req: Request) {
       data: {
         status: newStatus,
         ...(videoUrl && { videoUrl }),
+        ...(cloudinaryPublicId && { cloudinaryPublicId }), // <<< AJOUT : Ajouter le public_id seulement s'il existe
         ...videoData
       }
     });
@@ -210,6 +236,8 @@ export async function POST(req: Request) {
       id: updatedVideo.id,
       status: updatedVideo.status,
       videoUrl: updatedVideo.videoUrl
+      //cloudinaryPublicId: updatedVideo.cloudinaryPublicId // Log du public_id
+
     });
 
     return NextResponse.json({
@@ -218,6 +246,7 @@ export async function POST(req: Request) {
         id: updatedVideo.id,
         status: updatedVideo.status,
         videoUrl: updatedVideo.videoUrl,
+        cloudinaryPublicId: updatedVideo.cloudinaryPublicId, // Retourner le public_id dans la réponse
         sourceImageId: updatedVideo.sourceImageId
       }
     });

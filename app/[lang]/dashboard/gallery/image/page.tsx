@@ -9,7 +9,8 @@ import {
   } from "@/components/ui/breadcrumb"
   import { Separator } from "@/components/ui/separator"
   import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-  import { ImageThumbnail } from "@/components/image-thumbnailGenerated"
+  import { ImageThumbnail as ImageThumbnailGenerated } from "@/components/image-thumbnailGenerated"
+  import { ImageThumbnail } from "@/components/image-thumbnail"
   import {
     Accordion,
     AccordionContent,
@@ -25,7 +26,10 @@ import {
   
   // --- Fonction pour récupérer les dessins ---
   async function getUserDrawings(userId: string): Promise<Drawing[]> {
+
+
     if (!userId) return [];
+    
     try {
         const drawings = await prisma.drawing.findMany({
             where: { userId: userId, isDeleted: false },
@@ -118,10 +122,52 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                         <p className="text-muted-foreground">Vos créations et images générées.</p>
                     </div>
   
+
+
+  
                     {/* Accordéon principal */}
                     {/* 'defaultValue' peut être un tableau si type="multiple" */}
                     <Accordion type="multiple" defaultValue={['item-drawings', 'item-generated-images']} className="w-full space-y-4">
   
+
+
+             {/* --- Section Images Générées --- */}
+             <AccordionItem value="item-generated-images">
+                             {/* Utilisation de la variable 'generatedImages' maintenant déclarée */}
+                             <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
+                                Mes Images Générées ({generatedImages.length})
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-4">
+                                {generatedImages.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        {generatedImages.map((image) => ( /* ... mapping des images générées ... */
+                                            image.imageUrl ? (
+                                                <ImageThumbnailGenerated
+                                                    key={image.id}
+                                                    id={image.id}
+                                                    url={image.imageUrl}
+                                                    title={image.prompt ? (image.prompt.length > 50 ? image.prompt.substring(0, 47) + "..." : image.prompt) : (image.modelUsed || "Image générée")}
+                                                    lang={lang}
+                                                />
+                                            ) : (
+                                                 <div key={image.id} className="aspect-video bg-muted ..."> Image indisponible </div>
+                                            )
+                                        ))}
+                                    </div>
+                                ) : (
+
+                                    // Message si aucun dessin n'est trouvé
+                                    
+                                    <p className="text-muted-foreground pt-4">
+                                    
+                                    {userId ? "Vous n'avez pas encore généré d'images." : "Connectez-vous pour voir vos dessins."}
+                                    
+                                    </p>
+                                    
+                                    )}
+                            </AccordionContent>
+                        </AccordionItem>
+
                         {/* --- Section Dessins --- */}
                         <AccordionItem value="item-drawings">
                             <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
@@ -152,42 +198,7 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                             </AccordionContent>
                         </AccordionItem>
   
-                        {/* --- Section Images Générées --- */}
-                        <AccordionItem value="item-generated-images">
-                             {/* Utilisation de la variable 'generatedImages' maintenant déclarée */}
-                             <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
-                                Mes Images Générées ({generatedImages.length})
-                            </AccordionTrigger>
-                            <AccordionContent className="pt-4">
-                                {generatedImages.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                        {generatedImages.map((image) => ( /* ... mapping des images générées ... */
-                                            image.imageUrl ? (
-                                                <ImageThumbnail
-                                                    key={image.id}
-                                                    id={image.id}
-                                                    url={image.imageUrl}
-                                                    title={image.prompt ? (image.prompt.length > 50 ? image.prompt.substring(0, 47) + "..." : image.prompt) : (image.modelUsed || "Image générée")}
-                                                    lang={lang}
-                                                />
-                                            ) : (
-                                                 <div key={image.id} className="aspect-video bg-muted ..."> Image indisponible </div>
-                                            )
-                                        ))}
-                                    </div>
-                                ) : (
-
-                                    // Message si aucun dessin n'est trouvé
-                                    
-                                    <p className="text-muted-foreground pt-4">
-                                    
-                                    {userId ? "Vous n'avez pas encore généré d'images." : "Connectez-vous pour voir vos dessins."}
-                                    
-                                    </p>
-                                    
-                                    )}
-                            </AccordionContent>
-                        </AccordionItem>
+           
   
                     </Accordion>
                 </div>
