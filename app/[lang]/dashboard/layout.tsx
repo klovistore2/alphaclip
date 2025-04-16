@@ -12,9 +12,12 @@ import { Localy, getDictionary } from '../dictionaries';
     params,
   }: {
     children: React.ReactNode
-    params: { lang: Localy }
+    params: Promise<{ lang: Localy }>
   }) {
-    const lang = params.lang;
+
+
+    const p = await params
+    const lang = p.lang;
     // Appelle la fonction pour obtenir directement les données traduites
     const translatedData = await getDictionary(lang);
   

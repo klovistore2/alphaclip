@@ -15,6 +15,8 @@ export default async function Page({
   params: Promise<{ lang: Localy }>
 }) {
   
+
+  
   const { lang } = await params
   
   const dict = await getDictionary(lang) 

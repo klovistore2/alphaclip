@@ -42,6 +42,7 @@ aitubbb.com
 - passer le canva en 16:9
 - ajouter le choic des media / pas de redirection gallery
 - passer d'un mode a l'autre
+- le cas 0 pour image2sound
 - lang
 - prolong video
 - pop up shadcn quand la video est prete depuis le webhook
