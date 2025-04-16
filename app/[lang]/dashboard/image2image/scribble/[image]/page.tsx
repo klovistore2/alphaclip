@@ -3,18 +3,17 @@
 
 import { useState, useEffect } from 'react';
 import Image from "next/image"
-import { PencilLine, Loader2, ImagePlus } from "lucide-react" // Ajout ImagePlus
-import { useParams, useRouter } from 'next/navigation'; // Importer useRouter
+import { PencilLine, Loader2, ImagePlus } from "lucide-react"
+import { useParams, useRouter } from 'next/navigation';
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select} from "@/components/ui/select"
+import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
-// Retirer l'import du type Drawing ici car on va utiliser un type local pour les données fetchées
-// import type { Drawing } from "@prisma/client";
-import { generateScribbleImageAction } from '@/lib/actions/scribbleAction'; // Adapter le chemin
+import { generateScribbleImageAction } from '@/lib/actions/scribbleAction';
 
 // Type local pour les données du dessin récupérées via l'API
 interface FetchedDrawingData {
@@ -30,16 +29,19 @@ const scribbleModels: { name: string; id: ReplicateModelId }[] = [
 ];
 
 export default function ScribblePlaygroundPage() {
-    const router = useRouter(); // Hook pour la navigation
+    const router = useRouter();
     const routeParams = useParams<{ lang: string; image: string }>();
-    const lang = routeParams.lang;
-    const drawingId = routeParams.image; // Peut être "0" ou un ID réel
+    const lang = routeParams.lang as Localy;
+    const drawingId = routeParams.image;
+    
+    // Dictionnaire pour l'internationalisation
+    const [dict, setDict] = useState<TypeDictionary | null>(null);
 
     // --- États du Composant ---
     const [drawing, setDrawing] = useState<FetchedDrawingData | null>(null);
-    const [isLoadingDrawing, setIsLoadingDrawing] = useState(true); // Commence en chargement
+    const [isLoadingDrawing, setIsLoadingDrawing] = useState(true);
     const [drawingError, setDrawingError] = useState<string | null>(null);
-    const [isSelectingSource, setIsSelectingSource] = useState(false); // Nouvel état
+    const [isSelectingSource, setIsSelectingSource] = useState(false);
 
     const [prompt, setPrompt] = useState<string>("");
     const [selectedModel, setSelectedModel] = useState<ReplicateModelId>(scribbleModels[0]?.id || "");
@@ -47,6 +49,15 @@ export default function ScribblePlaygroundPage() {
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [generatedImageId, setGeneratedImageId] = useState<string | null>(null);
+    
+    // --- Chargement du dictionnaire ---
+    useEffect(() => {
+        async function loadDictionary() {
+            const dictionary = await getDictionary(lang);
+            setDict(dictionary);
+        }
+        loadDictionary();
+    }, [lang]);
 
     // --- Fetch des données du dessin via l'API Route ---
     useEffect(() => {
@@ -54,49 +65,55 @@ export default function ScribblePlaygroundPage() {
         if (drawingId === "0") {
             console.log("Drawing ID is 0, entering selection mode.");
             setIsSelectingSource(true);
-            setDrawing(null); // Pas de dessin chargé
-            setIsLoadingDrawing(false); // Terminé le "chargement" initial
+            setDrawing(null);
+            setIsLoadingDrawing(false);
             setDrawingError(null);
-            return; // Sortir de l'effet
+            return;
         }
 
         // Sinon, tenter de charger le dessin via l'API
         setIsSelectingSource(false);
         setIsLoadingDrawing(true);
         setDrawingError(null);
-        setDrawing(null); // Reset au cas où on navigue d'un dessin à un autre
+        setDrawing(null);
 
         async function fetchDrawingData() {
-            console.log("Fetching drawing data for ID:", drawingId);
             try {
-                const response = await fetch(`/api/drawings/${drawingId}`); // Appel à notre API route
+                const response = await fetch(`/api/drawings/${drawingId}`);
 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        throw new Error("Dessin non trouvé ou accès refusé.");
+                        throw new Error(dict?.scribble?.errors?.loading_failed || 
+                            (lang === 'fr' ? "Dessin non trouvé ou accès refusé." : "Drawing not found or access denied."));
                     } else {
-                        throw new Error(`Erreur API: ${response.statusText}`);
+                        throw new Error(lang === 'fr' ? 
+                            `Erreur API: ${response.statusText}` : 
+                            `API Error: ${response.statusText}`);
                     }
                 }
 
                 const data: FetchedDrawingData = await response.json();
 
                 if (!data.previewUrl) {
-                    throw new Error("L'aperçu pour ce dessin est manquant.");
+                    throw new Error(dict?.scribble?.errors?.invalid_source || 
+                        (lang === 'fr' ? "L'aperçu pour ce dessin est manquant." : "The preview for this drawing is missing."));
                 }
 
-                setDrawing(data); // Met à jour l'état avec les données reçues
+                setDrawing(data);
 
             } catch (error) {
                 console.error("Failed to fetch drawing data:", error);
-                setDrawingError(error instanceof Error ? error.message : "Impossible de charger le dessin.");
+                setDrawingError(error instanceof Error ? 
+                    error.message : 
+                    dict?.scribble?.errors?.loading_failed || 
+                    (lang === 'fr' ? "Impossible de charger le dessin." : "Failed to load the drawing."));
             } finally {
                 setIsLoadingDrawing(false);
             }
         }
 
         fetchDrawingData();
-    }, [drawingId]); // Ré-exécuter si l'ID du dessin change
+    }, [drawingId, dict, lang]);
 
     // --- Fonction pour naviguer vers la galerie ---
     const navigateToGallery = () => {
@@ -110,19 +127,19 @@ export default function ScribblePlaygroundPage() {
     // --- Fonction pour Gérer la Génération ---
     const handleGenerate = async () => {
       // 1. Vérifier les prérequis avant de lancer
-      //    (dessin chargé, prompt non vide, modèle sélectionné, pas déjà en cours de génération)
       if (!drawing || !drawing.previewUrl || !prompt || !selectedModel || isGenerating) {
           if (!drawing || !drawing.previewUrl) {
-              setGenerationError("Veuillez d'abord avoir un dessin source valide.");
+              setGenerationError(dict?.scribble?.errors?.invalid_source || 
+                  (lang === 'fr' ? "Veuillez d'abord avoir un dessin source valide." : "Please select a valid source drawing first."));
           } else if (!prompt) {
-              setGenerationError("Veuillez entrer un prompt décrivant l'image souhaitée.");
+              setGenerationError(dict?.scribble?.errors?.missing_prompt || 
+                  (lang === 'fr' ? "Veuillez entrer un prompt décrivant l'image souhaitée." : "Please enter a prompt describing the desired image."));
           } else if (!selectedModel) {
-              setGenerationError("Veuillez sélectionner un modèle de génération.");
+              setGenerationError(dict?.scribble?.errors?.missing_model || 
+                  (lang === 'fr' ? "Veuillez sélectionner un modèle de génération." : "Please select a generation model."));
           }
-          // Si la seule raison est 'isGenerating', on ne fait rien (évite double clic)
-          // Sinon (manque dessin, prompt ou modèle), on arrête ici.
-           if (!drawing || !drawing.previewUrl || !prompt || !selectedModel) return;
-           if (isGenerating) return; // Sécurité anti double-clic
+          if (!drawing || !drawing.previewUrl || !prompt || !selectedModel) return;
+          if (isGenerating) return; // Sécurité anti double-clic
       }
 
       // 2. Initialiser l'état de génération
@@ -181,28 +198,39 @@ export default function ScribblePlaygroundPage() {
           }
 
       } catch (error) {
-          // 5. Gérer les erreurs (échec de l'appel API, erreur dans l'action, etc.)
+          // 5. Gérer les erreurs
           console.error("Generation failed:", error);
-          setGenerationError(error instanceof Error ? error.message : "Échec de la génération.");
-          setGeneratedUrls(null); // S'assurer qu'aucun résultat partiel n'est affiché
+          setGenerationError(error instanceof Error ? 
+              error.message : 
+              dict?.scribble?.errors?.general || 
+              (lang === 'fr' ? "Échec de la génération." : "Generation failed."));
+          setGeneratedUrls(null);
       } finally {
-          // 6. Terminer l'état de chargement, que ce soit un succès ou un échec
+          // 6. Terminer l'état de chargement
           setIsGenerating(false);
           console.log("handleGenerate: Finished generation attempt.");
       }
   };
 
-    // --- Affichage conditionnel pendant le chargement initial ---
-     if (isLoadingDrawing && drawingId !== "0") { // Affiche chargement seulement si on fetch
-        return <div className="container py-10 flex justify-center items-center"><Loader2 className="h-8 w-8 animate-spin" /> Chargement du dessin...</div>;
+    // Attendons que le dictionnaire soit chargé
+    if (!dict) {
+        return <div className="container py-10 flex justify-center items-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
     }
+    
+    // --- Affichage conditionnel pendant le chargement initial ---
+    if (isLoadingDrawing && drawingId !== "0") {
+        return <div className="container py-10 flex justify-center items-center">
+            <Loader2 className="h-8 w-8 animate-spin" /> {dict.scribble.loading}
+        </div>;
+    }
+    
     // Affiche erreur de chargement du dessin (si non en mode sélection)
     if (drawingError && !isSelectingSource) {
         return <div className="container py-10 text-destructive">{drawingError}</div>;
     }
 
     // Utiliser un titre par défaut ou celui du dessin chargé
-    const displayTitle = drawing?.title || "Nouveau Scribble";
+    const displayTitle = drawing?.title || dict.scribble.title;
 
     // --- Rendu JSX ---
     return (
@@ -210,12 +238,11 @@ export default function ScribblePlaygroundPage() {
             <div className="md:hidden"> {/* ... */} </div>
             <div className="hidden h-full flex-col md:flex">
                 {/* Header */}
-                <div className="container flex ... md:h-16">
+                <div className="container flex items-center justify-between md:h-16">
                     <h2 className="text-lg font-semibold flex items-center">
                         <PencilLine className="mr-2 h-5 w-5" />
-                        Scribble Playground - {displayTitle}
+                        {dict.scribble.title} - {displayTitle}
                     </h2>
-                     {/* ... */}
                 </div>
                 <Separator />
 
@@ -228,20 +255,17 @@ export default function ScribblePlaygroundPage() {
                             {/* Carte Image Source (Conditionnelle) */}
                             <Card className="col-span-1">
                                 <CardContent className="p-4 space-y-2">
-                                    <h3 className="text-lg font-medium">Dessin Source</h3>
+                                    <h3 className="text-lg font-medium">{dict.scribble.source_drawing}</h3>
                                     <div className="aspect-video bg-muted rounded-md overflow-hidden relative border flex items-center justify-center">
                                         {isSelectingSource ? (
-                                            // Afficher le bouton si aucun dessin n'est chargé (ID="0")
                                             <Button variant="outline" onClick={navigateToGallery}>
                                                 <ImagePlus className="mr-2 h-4 w-4" />
-                                                Sélectionner un Dessin
+                                                {dict.scribble.select_drawing}
                                             </Button>
                                         ) : drawing?.previewUrl ? (
-                                            // Afficher l'image si elle est chargée
                                             <Image src={drawing.previewUrl} alt={displayTitle} fill style={{ objectFit: 'contain' }} priority sizes="(max-width: 1024px) 100vw, 33vw" />
                                         ) : (
-                                            // Afficher placeholder si erreur ou état intermédiaire (normalement couvert par les checks plus haut)
-                                             <p className="text-sm text-muted-foreground p-4">Chargement ou erreur...</p>
+                                            <p className="text-sm text-muted-foreground p-4">{dict.scribble.loading_error}</p>
                                         )}
                                     </div>
                                 </CardContent>
@@ -254,11 +278,27 @@ export default function ScribblePlaygroundPage() {
                                      <Select value={selectedModel} onValueChange={(v) => setSelectedModel(v as ReplicateModelId)} disabled={isGenerating || isSelectingSource}> {/* Désactiver si pas d'image source */}
                                          {/* ... Options ... */}
                                      </Select>
-                                     <Textarea id="prompt-input" value={prompt} onChange={(e) => setPrompt(e.target.value)} disabled={isGenerating || isSelectingSource} placeholder="..." />
+                                     <Textarea 
+                                        id="prompt-input" 
+                                        value={prompt} 
+                                        onChange={(e) => setPrompt(e.target.value)} 
+                                        disabled={isGenerating || isSelectingSource} 
+                                        placeholder={dict.scribble.prompt_placeholder}
+                                        className="min-h-[80px]"
+                                     />
                                      <div className="flex justify-end">
-                                         {/* Désactiver si pas d'image source sélectionnée */}
                                          <Button type="button" onClick={handleGenerate} disabled={isGenerating || !prompt || !selectedModel || !drawing}>
-                                             {isGenerating ? <><Loader2 /> Génération...</> : "Générer l Image"}
+                                             {isGenerating ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                                                    {dict.scribble.generating}
+                                                </>
+                                             ) : (
+                                                <>
+                                                    <ImagePlus className="mr-2 h-4 w-4" />
+                                                    {dict.scribble.button}
+                                                </>
+                                             )}
                                          </Button>
                                      </div>
                                       {generationError && <p className="text-destructive text-sm">{generationError}</p>}
@@ -270,15 +310,15 @@ export default function ScribblePlaygroundPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Image Source (Conditionnel) */}
                             <div className="flex flex-col space-y-4">
-                                <h3 className="text-lg font-medium">Source</h3>
+                                <h3 className="text-lg font-medium">{dict.scribble.source}</h3>
                                 <Card className="border rounded-lg overflow-hidden aspect-square flex items-center justify-center bg-muted">
                                     <CardContent className="p-0 w-full h-full relative">
                                         {isSelectingSource ? (
-                                            <p className="text-sm text-muted-foreground p-4 text-center">Aucun dessin sélectionné</p>
+                                            <p className="text-sm text-muted-foreground p-4 text-center">{dict.scribble.no_drawing}</p>
                                         ) : drawing?.previewUrl ? (
                                             <Image src={drawing.previewUrl} alt={displayTitle} fill style={{ objectFit: 'contain' }} sizes="(max-width: 768px) 100vw, 50vw" />
                                         ) : (
-                                            <p className="text-sm text-muted-foreground p-4 text-center">Chargement...</p>
+                                            <p className="text-sm text-muted-foreground p-4 text-center">{dict.scribble.loading}</p>
                                         )}
                                     </CardContent>
                                 </Card>
@@ -288,17 +328,17 @@ export default function ScribblePlaygroundPage() {
                              <div className="flex flex-col space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-medium">
-                                        Résultat 
+                                        {dict.scribble.result}
                                         {generatedImageId && (
                                             <span className="ml-2 text-sm text-green-600 font-normal">
-                                                (Enregistrée)
+                                                ({dict.scribble.saved})
                                             </span>
                                         )}
                                     </h3>
                                     {isGenerating && (
                                         <div className="flex items-center text-amber-600">
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            <span className="text-sm">Génération en cours...</span>
+                                            <span className="text-sm">{dict.scribble.generation_in_progress}</span>
                                         </div>
                                     )}
                                 </div>
@@ -307,7 +347,7 @@ export default function ScribblePlaygroundPage() {
                                         {isGenerating ? (
                                             <div className="flex flex-col items-center justify-center h-full p-4">
                                                 <Loader2 className="h-8 w-8 animate-spin mb-4" />
-                                                <p className="text-sm text-center">Génération en cours...</p>
+                                                <p className="text-sm text-center">{dict.scribble.generation_in_progress}</p>
                                             </div>
                                         ) : generatedUrls && generatedUrls.length > 0 ? (
                                             <>
@@ -321,7 +361,7 @@ export default function ScribblePlaygroundPage() {
                                                 />
                                                 {generatedImageId && (
                                                     <div className="absolute bottom-2 right-2 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
-                                                        Sauvegardée
+                                                        {dict.scribble.saved}
                                                     </div>
                                                 )}
                                             </>
@@ -332,7 +372,7 @@ export default function ScribblePlaygroundPage() {
                                         ) : (
                                             <div className="flex flex-col items-center justify-center h-full p-4">
                                                 <p className="text-sm text-muted-foreground text-center">
-                                                    Complétez les informations et cliquez sur Générer l Image
+                                                    {dict.scribble.complete_info}
                                                 </p>
                                             </div>
                                         )}
@@ -346,7 +386,7 @@ export default function ScribblePlaygroundPage() {
                                             size="sm"
                                             onClick={() => window.open(generatedUrls[0], '_blank')}
                                         >
-                                            Voir en taille réelle
+                                            {dict.scribble.full_size}
                                         </Button>
                                     </div>
                                 )}

@@ -51,6 +51,32 @@ export interface TypeDictionary {
       step3_desc: string;
     }
   };
+  scribble: {
+    title: string;
+    description: string;
+    source_drawing: string;
+    select_drawing: string;
+    loading: string;
+    loading_error: string;
+    model_select: string;
+    prompt_placeholder: string;
+    button: string;
+    generating: string;
+    source: string;
+    result: string;
+    no_drawing: string;
+    saved: string;
+    generation_in_progress: string;
+    full_size: string;
+    complete_info: string;
+    errors: {
+      invalid_source: string;
+      missing_prompt: string;
+      missing_model: string;
+      loading_failed: string;
+      general: string;
+    }
+  };
   create_image: {
     title: string;
     description: string;

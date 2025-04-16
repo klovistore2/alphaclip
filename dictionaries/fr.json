@@ -33,6 +33,32 @@
       "step3_desc": "La génération de la nouvelle vidéo avec son est lancée et peut prendre quelques minutes."
     }
   },
+  "scribble": {
+    "title": "Espace Scribble",
+    "description": "Générez des images détaillées à partir de vos croquis.",
+    "source_drawing": "Dessin Source",
+    "select_drawing": "Sélectionner un Dessin",
+    "loading": "Chargement du dessin...",
+    "loading_error": "Erreur de chargement...",
+    "model_select": "Sélectionner un Modèle",
+    "prompt_placeholder": "Décrivez l'image que vous souhaitez générer à partir de votre dessin (ex: 'un paysage coloré avec des montagnes et un lac', 'un portrait réaliste d'une femme aux cheveux longs')...",
+    "button": "Générer l'Image",
+    "generating": "Génération...",
+    "source": "Source",
+    "result": "Résultat",
+    "no_drawing": "Aucun dessin sélectionné",
+    "saved": "Sauvegardée",
+    "generation_in_progress": "Génération en cours...",
+    "full_size": "Voir en taille réelle",
+    "complete_info": "Complétez les informations et cliquez sur Générer l'Image",
+    "errors": {
+      "invalid_source": "Veuillez d'abord avoir un dessin source valide.",
+      "missing_prompt": "Veuillez entrer un prompt décrivant l'image souhaitée.",
+      "missing_model": "Veuillez sélectionner un modèle de génération.",
+      "loading_failed": "Impossible de charger le dessin.",
+      "general": "La génération a échoué ou n'a pas retourné d'image."
+    }
+  },
   "create_image": {
     "title": "Créer une image",
     "description": "Créez une image à partir d'une description textuelle.",

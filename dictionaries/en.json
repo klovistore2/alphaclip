@@ -33,6 +33,32 @@
         "step3_desc": "The generation of the new video with sound is started and may take a few minutes."
       }
     },
+    "scribble": {
+      "title": "Scribble Playground",
+      "description": "Generate detailed images from your sketches.",
+      "source_drawing": "Source Drawing",
+      "select_drawing": "Select a Drawing",
+      "loading": "Loading drawing...",
+      "loading_error": "Loading error...",
+      "model_select": "Select Model",
+      "prompt_placeholder": "Describe the image you want to generate from your drawing (e.g. 'a colorful landscape with mountains and a lake', 'a realistic portrait of a woman with long hair')...",
+      "button": "Generate Image",
+      "generating": "Generating...",
+      "source": "Source",
+      "result": "Result",
+      "no_drawing": "No drawing selected",
+      "saved": "Saved",
+      "generation_in_progress": "Generation in progress...",
+      "full_size": "View full size",
+      "complete_info": "Complete the information and click Generate Image",
+      "errors": {
+        "invalid_source": "Please select a valid source drawing first.",
+        "missing_prompt": "Please enter a prompt describing the desired image.",
+        "missing_model": "Please select a generation model.",
+        "loading_failed": "Failed to load the drawing.",
+        "general": "The generation failed or did not return an image."
+      }
+    },
     "create_image": {
       "title": "Create Image",
       "description": "Create an image using a text prompt.",
