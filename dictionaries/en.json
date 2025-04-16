@@ -59,6 +59,30 @@
         "general": "The generation failed or did not return an image."
       }
     },
+    "variation": {
+      "title": "Image Variation",
+      "description": "Create variations of your existing images.",
+      "source_image": "Source Image",
+      "select_image": "Select an Image",
+      "loading": "Loading image...",
+      "loading_error": "Loading error...",
+      "prompt_placeholder": "Describe the modification you want to make to the image (e.g. 'Transform this image into cartoon style', 'Add a cat next to the subject')...",
+      "button": "Modify Image with Gemini",
+      "generating": "Modification in progress...",
+      "source": "Source",
+      "result": "Result",
+      "no_image": "No image selected",
+      "saved": "Saved",
+      "generation_in_progress": "Generation in progress...",
+      "full_size": "View full size",
+      "complete_info": "Complete the prompt and click Modify Image to generate a variation",
+      "errors": {
+        "invalid_source": "Please select a source image first.",
+        "missing_prompt": "Please enter a prompt describing the desired modification.",
+        "loading_failed": "Failed to load the image.",
+        "general": "The generation failed or did not return an image."
+      }
+    },
     "create_image": {
       "title": "Create Image",
       "description": "Create an image using a text prompt.",

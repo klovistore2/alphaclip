@@ -59,6 +59,30 @@
       "general": "La génération a échoué ou n'a pas retourné d'image."
     }
   },
+  "variation": {
+    "title": "Variation d'Image",
+    "description": "Créez des variations de vos images existantes.",
+    "source_image": "Image Source",
+    "select_image": "Sélectionner une Image",
+    "loading": "Chargement de l'image...",
+    "loading_error": "Erreur de chargement...",
+    "prompt_placeholder": "Décrivez la modification que vous souhaitez apporter à l'image (ex: 'Transformez cette image en style cartoon', 'Ajoutez un chat à côté du sujet')...",
+    "button": "Modifier l'Image avec Gemini",
+    "generating": "Modification en cours...",
+    "source": "Source",
+    "result": "Résultat",
+    "no_image": "Aucune image sélectionnée",
+    "saved": "Sauvegardée",
+    "generation_in_progress": "Génération en cours...",
+    "full_size": "Voir en taille réelle",
+    "complete_info": "Complétez le prompt et cliquez sur Modifier l'Image pour générer une variation",
+    "errors": {
+      "invalid_source": "Veuillez d'abord sélectionner une image source.",
+      "missing_prompt": "Veuillez entrer un prompt décrivant la modification souhaitée.",
+      "loading_failed": "Impossible de charger l'image.",
+      "general": "La génération a échoué ou n'a pas retourné d'image."
+    }
+  },
   "create_image": {
     "title": "Créer une image",
     "description": "Créez une image à partir d'une description textuelle.",

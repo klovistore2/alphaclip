@@ -77,6 +77,30 @@ export interface TypeDictionary {
       general: string;
     }
   };
+  variation: {
+    title: string;
+    description: string;
+    source_image: string;
+    select_image: string;
+    loading: string;
+    loading_error: string;
+    prompt_placeholder: string;
+    button: string;
+    generating: string;
+    source: string;
+    result: string;
+    no_image: string;
+    saved: string;
+    generation_in_progress: string;
+    full_size: string;
+    complete_info: string;
+    errors: {
+      invalid_source: string;
+      missing_prompt: string;
+      loading_failed: string;
+      general: string;
+    }
+  };
   create_image: {
     title: string;
     description: string;

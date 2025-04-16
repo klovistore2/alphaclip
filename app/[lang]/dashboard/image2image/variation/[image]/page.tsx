@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 import { generateImageVariationAction } from '@/lib/actions/variationActions';
 
@@ -24,8 +25,11 @@ interface FetchedImageData {
 export default function ImageVariationPage() {
     const router = useRouter();
     const routeParams = useParams<{ lang: string; image: string }>();
-    const lang = routeParams.lang;
+    const lang = routeParams.lang as Localy;
     const imageId = routeParams.image;
+    
+    // Dictionnaire pour l'internationalisation
+    const [dict, setDict] = useState<TypeDictionary | null>(null);
 
     // --- États du Composant ---
     const [sourceImage, setSourceImage] = useState<FetchedImageData | null>(null);
@@ -38,6 +42,15 @@ export default function ImageVariationPage() {
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [generatedImageId, setGeneratedImageId] = useState<string | null>(null);
+    
+    // --- Chargement du dictionnaire ---
+    useEffect(() => {
+        async function loadDictionary() {
+            const dictionary = await getDictionary(lang);
+            setDict(dictionary);
+        }
+        loadDictionary();
+    }, [lang]);
 
     // --- Fetch des données de l'image via l'API Route ---
     useEffect(() => {
@@ -65,16 +78,20 @@ export default function ImageVariationPage() {
 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        throw new Error("Image non trouvée ou accès refusé.");
+                        throw new Error(dict?.variation?.errors?.loading_failed || 
+                            (lang === 'fr' ? "Image non trouvée ou accès refusé." : "Image not found or access denied."));
                     } else {
-                        throw new Error(`Erreur API: ${response.statusText}`);
+                        throw new Error(lang === 'fr' ? 
+                            `Erreur API: ${response.statusText}` : 
+                            `API Error: ${response.statusText}`);
                     }
                 }
 
                 const data: FetchedImageData = await response.json();
 
                 if (!data.imageUrl) {
-                    throw new Error("L'URL de l'image est manquante.");
+                    throw new Error(dict?.variation?.errors?.invalid_source || 
+                        (lang === 'fr' ? "L'URL de l'image est manquante." : "The image URL is missing."));
                 }
 
                 setSourceImage(data);
@@ -86,7 +103,10 @@ export default function ImageVariationPage() {
 
             } catch (error) {
                 console.error("Failed to fetch image data:", error);
-                setImageError(error instanceof Error ? error.message : "Impossible de charger l'image.");
+                setImageError(error instanceof Error ? 
+                    error.message : 
+                    dict?.variation?.errors?.loading_failed || 
+                    (lang === 'fr' ? "Impossible de charger l'image." : "Failed to load the image."));
             } finally {
                 setIsLoadingImage(false);
             }
@@ -106,9 +126,11 @@ export default function ImageVariationPage() {
         // 1. Vérifier les prérequis avant de lancer
         if (!sourceImage || !sourceImage.imageUrl || !prompt || isGenerating) {
             if (!sourceImage || !sourceImage.imageUrl) {
-                setGenerationError("Veuillez d'abord sélectionner une image source.");
+                setGenerationError(dict?.variation?.errors?.invalid_source || 
+                    (lang === 'fr' ? "Veuillez d'abord sélectionner une image source." : "Please select a source image first."));
             } else if (!prompt) {
-                setGenerationError("Veuillez entrer un prompt décrivant la modification souhaitée.");
+                setGenerationError(dict?.variation?.errors?.missing_prompt || 
+                    (lang === 'fr' ? "Veuillez entrer un prompt décrivant la modification souhaitée." : "Please enter a prompt describing the desired modification."));
             }
             if (!sourceImage || !sourceImage.imageUrl || !prompt) return;
             if (isGenerating) return; // Sécurité anti double-clic
@@ -153,11 +175,15 @@ export default function ImageVariationPage() {
                 }
             } else {
                 console.error("Generation action returned failure or no URLs:", result);
-                throw new Error(result.error || "La génération a échoué ou n'a pas retourné d'image.");
+                throw new Error(result.error || dict?.variation?.errors?.general || 
+                    (lang === 'fr' ? "La génération a échoué ou n'a pas retourné d'image." : "The generation failed or did not return an image."));
             }
         } catch (error) {
             console.error("Variation generation failed:", error);
-            setGenerationError(error instanceof Error ? error.message : "Échec de la génération.");
+            setGenerationError(error instanceof Error ? 
+                error.message : 
+                dict?.variation?.errors?.general || 
+                (lang === 'fr' ? "Échec de la génération." : "Generation failed."));
             setGeneratedUrls(null);
         } finally {
             setIsGenerating(false);
@@ -165,9 +191,16 @@ export default function ImageVariationPage() {
         }
     };
 
+    // Attendons que le dictionnaire soit chargé
+    if (!dict) {
+        return <div className="container py-10 flex justify-center items-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
+    
     // --- Affichage conditionnel pendant le chargement initial ---
     if (isLoadingImage && imageId !== "0") {
-        return <div className="container py-10 flex justify-center items-center"><Loader2 className="h-8 w-8 animate-spin" /> Chargement de l image...</div>;
+        return <div className="container py-10 flex justify-center items-center">
+            <Loader2 className="h-8 w-8 animate-spin" /> {dict.variation.loading}
+        </div>;
     }
     
     if (imageError && !isSelectingSource) {
@@ -175,7 +208,7 @@ export default function ImageVariationPage() {
     }
 
     // Utiliser un titre par défaut ou celui de l'image chargée
-    const displayTitle = sourceImage?.title || "Nouvelle Variation";
+    const displayTitle = sourceImage?.title || dict.variation.title;
 
     // --- Rendu JSX ---
     return (
@@ -188,7 +221,7 @@ export default function ImageVariationPage() {
                 <div className="container flex items-center justify-between md:h-16">
                     <h2 className="text-lg font-semibold flex items-center">
                         <Wand2 className="mr-2 h-5 w-5" />
-                        Variation d Image - {displayTitle}
+                        {dict.variation.title} - {displayTitle}
                     </h2>
                 </div>
                 <Separator />
@@ -201,17 +234,17 @@ export default function ImageVariationPage() {
                             {/* Carte Image Source (Conditionnelle) */}
                             <Card className="col-span-1">
                                 <CardContent className="p-4 space-y-2">
-                                    <h3 className="text-lg font-medium">Image Source</h3>
+                                    <h3 className="text-lg font-medium">{dict.variation.source_image}</h3>
                                     <div className="aspect-video bg-muted rounded-md overflow-hidden relative border flex items-center justify-center">
                                         {isSelectingSource ? (
                                             <Button variant="outline" onClick={navigateToGallery}>
                                                 <ImagePlus className="mr-2 h-4 w-4" />
-                                                Sélectionner une Image
+                                                {dict.variation.select_image}
                                             </Button>
                                         ) : sourceImage?.imageUrl ? (
                                             <Image src={sourceImage.imageUrl} alt={displayTitle} fill style={{ objectFit: 'contain' }} priority sizes="(max-width: 1024px) 100vw, 33vw" />
                                         ) : (
-                                            <p className="text-sm text-muted-foreground p-4">Chargement ou erreur...</p>
+                                            <p className="text-sm text-muted-foreground p-4">{dict.variation.loading_error}</p>
                                         )}
                                     </div>
                                 </CardContent>
@@ -225,7 +258,7 @@ export default function ImageVariationPage() {
                                         value={prompt} 
                                         onChange={(e) => setPrompt(e.target.value)} 
                                         disabled={isGenerating || isSelectingSource} 
-                                        placeholder="Décrivez la modification que vous souhaitez apporter à l'image (ex: 'Transformez cette image en style cartoon', 'Ajoutez un chat à côté du sujet')" 
+                                        placeholder={dict.variation.prompt_placeholder}
                                         className="min-h-[120px]"
                                     />
                                     <div className="flex justify-end">
@@ -234,10 +267,17 @@ export default function ImageVariationPage() {
                                             onClick={handleGenerate} 
                                             disabled={isGenerating || !prompt || !sourceImage}
                                         >
-                                            {isGenerating ? 
-                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Modification en cours...</> : 
-                                                "Modifier l'Image avec Gemini"
-                                            }
+                                            {isGenerating ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                                                    {dict.variation.generating}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Wand2 className="mr-2 h-4 w-4" />
+                                                    {dict.variation.button}
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                     {generationError && <p className="text-destructive text-sm">{generationError}</p>}
@@ -249,15 +289,15 @@ export default function ImageVariationPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Image Source */}
                             <div className="flex flex-col space-y-4">
-                                <h3 className="text-lg font-medium">Source</h3>
+                                <h3 className="text-lg font-medium">{dict.variation.source}</h3>
                                 <Card className="border rounded-lg overflow-hidden aspect-square flex items-center justify-center bg-muted">
                                     <CardContent className="p-0 w-full h-full relative">
                                         {isSelectingSource ? (
-                                            <p className="text-sm text-muted-foreground p-4 text-center">Aucune image sélectionnée</p>
+                                            <p className="text-sm text-muted-foreground p-4 text-center">{dict.variation.no_image}</p>
                                         ) : sourceImage?.imageUrl ? (
                                             <Image src={sourceImage.imageUrl} alt={displayTitle} fill style={{ objectFit: 'contain' }} sizes="(max-width: 768px) 100vw, 50vw" />
                                         ) : (
-                                            <p className="text-sm text-muted-foreground p-4 text-center">Chargement...</p>
+                                            <p className="text-sm text-muted-foreground p-4 text-center">{dict.variation.loading}</p>
                                         )}
                                     </CardContent>
                                 </Card>
@@ -267,17 +307,17 @@ export default function ImageVariationPage() {
                             <div className="flex flex-col space-y-4">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-medium">
-                                        Résultat 
+                                        {dict.variation.result}
                                         {generatedImageId && (
                                             <span className="ml-2 text-sm text-green-600 font-normal">
-                                                (Enregistrée)
+                                                ({dict.variation.saved})
                                             </span>
                                         )}
                                     </h3>
                                     {isGenerating && (
                                         <div className="flex items-center text-amber-600">
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            <span className="text-sm">Génération en cours...</span>
+                                            <span className="text-sm">{dict.variation.generation_in_progress}</span>
                                         </div>
                                     )}
                                 </div>
@@ -286,7 +326,7 @@ export default function ImageVariationPage() {
                                         {isGenerating ? (
                                             <div className="flex flex-col items-center justify-center h-full p-4">
                                                 <Loader2 className="h-8 w-8 animate-spin mb-4" />
-                                                <p className="text-sm text-center">Modification en cours...</p>
+                                                <p className="text-sm text-center">{dict.variation.generating}</p>
                                             </div>
                                         ) : generatedUrls && generatedUrls.length > 0 ? (
                                             <>
@@ -299,7 +339,7 @@ export default function ImageVariationPage() {
                                                 />
                                                 {generatedImageId && (
                                                     <div className="absolute bottom-2 right-2 bg-green-600 text-white px-2 py-1 rounded-md text-xs">
-                                                        Sauvegardée
+                                                        {dict.variation.saved}
                                                     </div>
                                                 )}
                                             </>
@@ -310,7 +350,7 @@ export default function ImageVariationPage() {
                                         ) : (
                                             <div className="flex flex-col items-center justify-center h-full p-4">
                                                 <p className="text-sm text-muted-foreground text-center">
-                                                    Complétez le prompt et cliquez sur Modifier l Image pour générer une variation
+                                                    {dict.variation.complete_info}
                                                 </p>
                                             </div>
                                         )}
@@ -324,7 +364,7 @@ export default function ImageVariationPage() {
                                             size="sm"
                                             onClick={() => window.open(generatedUrls[0], '_blank')}
                                         >
-                                            Voir en taille réelle
+                                            {dict.variation.full_size}
                                         </Button>
                                     </div>
                                 )}
