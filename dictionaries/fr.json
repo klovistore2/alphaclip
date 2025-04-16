@@ -3,6 +3,36 @@
     "cart": "Ajouter au panier",
     "text": "Texte"
   },
+  "add_sound": {
+    "title": "Ajouter du Son",
+    "description": "Ajoutez du son à votre vidéo.",
+    "prompt_label": "Description du son",
+    "prompt_placeholder": "Décrivez l'ambiance sonore, les bruitages ou la musique souhaitée (ex: 'vent léger et oiseaux qui chantent', 'musique épique et bruits d'explosion', 'galop de cheval sur terre')...",
+    "loading": "Chargement de la vidéo source...",
+    "source_video": "Vidéo Source",
+    "preview_unavailable": "Prévisualisation indisponible",
+    "processing_time": "L'ajout de son peut prendre quelques minutes.",
+    "button": "Ajouter le Son",
+    "generating": "Génération du son...",
+    "untitled": "Vidéo sans titre",
+    "view_video": "Voir la vidéo avec son",
+    "errors": {
+      "invalid_source": "La vidéo source n'est pas chargée ou est invalide.",
+      "missing_prompt": "Veuillez entrer une description pour le son.",
+      "loading_failed": "Impossible de charger la vidéo source.",
+      "general": "L'ajout de son a échoué."
+    },
+    "success": "L'ajout de son a été lancé. Le traitement peut prendre plusieurs minutes.",
+    "how_it_works": {
+      "title": "Comment ça fonctionne",
+      "step1_title": "1. Vidéo Source",
+      "step1_desc": "La page charge la vidéo que vous avez sélectionnée.",
+      "step2_title": "2. Décrivez le son",
+      "step2_desc": "Utilisez un prompt pour décrire l'audio à ajouter à la vidéo.",
+      "step3_title": "3. Patientez",
+      "step3_desc": "La génération de la nouvelle vidéo avec son est lancée et peut prendre quelques minutes."
+    }
+  },
   "create_image": {
     "title": "Créer une image",
     "description": "Créez une image à partir d'une description textuelle.",

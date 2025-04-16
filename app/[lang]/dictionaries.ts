@@ -21,6 +21,36 @@ export interface TypeDictionary {
     cart: string;
     text: string;
   };
+  add_sound: {
+    title: string;
+    description: string;
+    prompt_label: string;
+    prompt_placeholder: string;
+    loading: string;
+    source_video: string;
+    preview_unavailable: string;
+    processing_time: string;
+    button: string;
+    generating: string;
+    untitled: string;
+    view_video: string;
+    errors: {
+      invalid_source: string;
+      missing_prompt: string;
+      loading_failed: string;
+      general: string;
+    };
+    success: string;
+    how_it_works: {
+      title: string;
+      step1_title: string;
+      step1_desc: string;
+      step2_title: string;
+      step2_desc: string;
+      step3_title: string;
+      step3_desc: string;
+    }
+  };
   create_image: {
     title: string;
     description: string;

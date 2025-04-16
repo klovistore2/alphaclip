@@ -3,6 +3,36 @@
       "cart": "Add to Cart",
       "text": "Texte"
     },
+    "add_sound": {
+      "title": "Add Sound",
+      "description": "Add sound to your video.",
+      "prompt_label": "Sound Description",
+      "prompt_placeholder": "Describe the sound atmosphere, sound effects or desired music (e.g.: 'light wind and birds singing', 'epic music and explosion sounds', 'horse gallop on ground')...",
+      "loading": "Loading source video...",
+      "source_video": "Source Video",
+      "preview_unavailable": "Preview unavailable",
+      "processing_time": "Adding sound may take a few minutes.",
+      "button": "Add Sound",
+      "generating": "Generating sound...",
+      "untitled": "Untitled video",
+      "view_video": "View video with sound",
+      "errors": {
+        "invalid_source": "Source video is not loaded or is invalid.",
+        "missing_prompt": "Please enter a description for the sound.",
+        "loading_failed": "Failed to load source video.",
+        "general": "Failed to add sound."
+      },
+      "success": "Sound addition has been started. Processing may take several minutes.",
+      "how_it_works": {
+        "title": "How it works",
+        "step1_title": "1. Source Video",
+        "step1_desc": "The page loads the video you selected.",
+        "step2_title": "2. Describe the sound",
+        "step2_desc": "Use a prompt to describe the audio to add to the video.",
+        "step3_title": "3. Wait",
+        "step3_desc": "The generation of the new video with sound is started and may take a few minutes."
+      }
+    },
     "create_image": {
       "title": "Create Image",
       "description": "Create an image using a text prompt.",
