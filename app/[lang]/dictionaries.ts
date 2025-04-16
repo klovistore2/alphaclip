@@ -217,13 +217,22 @@ export interface TypeDictionary {
     upgrade?: string;
     logOut?: string;
   };
-  videoCard?: {
+  videoCard: {
     untitled: string;
     unknownUser: string;
     views: string;
     download: string;
     share: string;
+    loading?: string; // Ajouté ici car utilisé dans le lecteur aussi
     options: string;
+    downloadFailed: string;
+    shareAction:  string;
+  };
+
+  watchpage?: { // Optionnel si la page watch n'est pas toujours rendue
+    suggestions: string;
+    no_suggestions: string;
+    // Ajouter d'autres clés spécifiques à cette page ici si besoin
   };
 }
 

@@ -209,6 +209,14 @@
       "views": "views",
       "download": "Download",
       "share": "Share",
-      "options": "Options"
-    }
+      "loading": "Loading...",
+      "options":"Options",
+      "shareAction": "Partager (à implémenter)",
+      "downloadFailed": "Erreur: URL de téléchargement manquante."
+  },
+  "watchpage": {
+    "suggestions": "Suggestions",
+    "no_suggestions": "No suggestions available yet."
+    
+  }
 }
