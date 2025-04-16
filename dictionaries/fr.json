@@ -35,6 +35,26 @@
     "paintStudio": "Studio de peinture",
     "models": "Modèles"
   },
+  "gallery": {
+    "title": "Galerie",
+    "subtitle": "Vos créations et images générées.",
+    "my_drawings": "Mes Dessins",
+    "my_generated_images": "Mes Images Générées",
+    "no_drawings": "Vous n'avez pas encore de dessins enregistrés.",
+    "no_generated_images": "Vous n'avez pas encore généré d'images.",
+    "login_required": "Connectez-vous pour voir vos dessins.",
+    "preview_unavailable": "Aperçu indisponible",
+    "image_unavailable": "Image indisponible",
+    "thumbnail": {
+      "view_full": "Voir en grand",
+      "open_in_scribble": "Ouvrir dans Scribble",
+      "open_in_variation": "Ouvrir dans Variation",
+      "open_in_image2video": "Ouvrir dans Image2Video",
+      "download": "Télécharger",
+      "options": "Options",
+      "untitled": "Sans titre"
+    }
+  },
   "metadata": {
     "title": "yatubbb",
     "description": "Facilite la création et le partage d'images et de vidéos générées par l'IA. Vous pouvez créer des images à partir de texte, les modifier et même générer des vidéos à partir d'images. La plateforme est conviviale et offre une variété d'outils pour améliorer votre processus créatif."

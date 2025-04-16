@@ -17,17 +17,24 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 
+// Importer les types depuis le fichier dictionaries
+import { Localy, TypeDictionary as Dictionary } from '@/app/[lang]/dictionaries';
+
 interface ImageThumbnailProps {
   id: string
   url: string
   // Modifier title pour accepter null, comme dans notre page galerie
   title: string | null;
-  lang: string
+  lang: Localy;
+  dictionary?: Dictionary;
 }
 
-export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
+export function ImageThumbnail({ id, url, title, lang, dictionary }: ImageThumbnailProps) {
   const router = useRouter()
   const [showFullImage, setShowFullImage] = useState(false)
+  
+  // Utiliser directement le dictionnaire passé en prop
+  const dict = dictionary
 
   // Renommer la fonction pour plus de clarté et Mettre à jour le chemin
   const openInScribblePlayground = () => {
@@ -47,7 +54,15 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
   }
 
   // Utiliser un titre par défaut si null pour l'affichage
-  const displayTitle = title || "Sans titre";
+  const displayTitle = title || (dict?.gallery?.thumbnail?.untitled || "Sans titre");
+  
+  // Valeurs par défaut si dict n'est pas fourni
+  const texts = {
+    view_full: dict?.gallery?.thumbnail?.view_full || "Voir en grand",
+    open_in_scribble: dict?.gallery?.thumbnail?.open_in_scribble || "Ouvrir dans Scribble",
+    download: dict?.gallery?.thumbnail?.download || "Télécharger",
+    options: dict?.gallery?.thumbnail?.options || "Options"
+  };
 
   return (
     <>
@@ -75,23 +90,23 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
                     className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
                   >
                     <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Options</span>
+                    <span className="sr-only">{texts.options}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => setShowFullImage(true)}>
                     <Maximize className="mr-2 h-4 w-4" />
-                    <span>Voir en grand</span> {/* Texte adapté */}
+                    <span>{texts.view_full}</span>
                   </DropdownMenuItem>
                   {/* --- Modification ici --- */}
                   <DropdownMenuItem onClick={openInScribblePlayground}>
-                    <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
-                    <span>Ouvrir dans Scribble</span> {/* Nouveau texte */}
+                    <PencilLine className="mr-2 h-4 w-4" />
+                    <span>{texts.open_in_scribble}</span>
                   </DropdownMenuItem>
                   {/* --- Fin Modification --- */}
                   <DropdownMenuItem onClick={downloadImage}>
                     <Download className="mr-2 h-4 w-4" />
-                    <span>Télécharger</span> {/* Texte adapté */}
+                    <span>{texts.download}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                    {/* Ajoutez d'autres options si nécessaire */}
@@ -130,13 +145,13 @@ export function ImageThumbnail({ id, url, title, lang }: ImageThumbnailProps) {
            <div className="flex justify-end items-center gap-2 mt-4 pt-4 border-t">
                 {/* --- Modification ici --- */}
                 <Button variant="outline" size="sm" onClick={openInScribblePlayground}>
-                    <PencilLine className="mr-2 h-4 w-4" /> {/* Nouvelle icône */}
-                    Ouvrir dans Scribble {/* Nouveau texte */}
+                    <PencilLine className="mr-2 h-4 w-4" />
+                    {texts.open_in_scribble}
                 </Button>
                  {/* --- Fin Modification --- */}
                 <Button variant="outline" size="sm" onClick={downloadImage}>
                   <Download className="mr-2 h-4 w-4" />
-                  Télécharger {/* Texte adapté */}
+                  {texts.download}
                 </Button>
           </div>
         </DialogContent>

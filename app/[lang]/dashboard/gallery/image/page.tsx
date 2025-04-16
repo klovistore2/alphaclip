@@ -21,21 +21,26 @@ import {
   import { auth } from "@/lib/auth";
   // Importer les deux types
   import type { Drawing, GeneratedImage } from "@prisma/client";
-  
-  type Language = 'en' | 'fr';
+  import { Localy, getDictionary } from "@/app/[lang]/dictionaries";
   
   // --- Fonction pour récupérer les dessins ---
   async function getUserDrawings(userId: string): Promise<Drawing[]> {
-
-
     if (!userId) return [];
     
     try {
         const drawings = await prisma.drawing.findMany({
             where: { userId: userId, isDeleted: false },
             orderBy: { createdAt: 'desc' },
+            // Limiter le nombre de résultats et sélectionner seulement les champs nécessaires
+            take: 50,
+            select: {
+              id: true,
+              title: true,
+              previewUrl: true,
+              createdAt: true
+            }
         });
-        return drawings;
+        return drawings as unknown as Drawing[];
     } catch (error) {
         console.error("Failed to fetch user drawings:", error);
         return [];
@@ -49,10 +54,17 @@ import {
           const generatedImages = await prisma.generatedImage.findMany({
               where: { userId: userId, isDeleted: false },
               orderBy: { createdAt: 'desc' },
-              // --- Correction : Clause SELECT supprimée ---
-              // select: { ... } // Supprimé pour retourner l'objet complet
+              // Limiter le nombre de résultats et sélectionner seulement les champs nécessaires
+              take: 50,
+              select: {
+                id: true,
+                prompt: true,
+                imageUrl: true,
+                modelUsed: true,
+                createdAt: true
+              }
           });
-          return generatedImages; // Retourne maintenant des objets GeneratedImage complets
+          return generatedImages as unknown as GeneratedImage[];
       } catch (error) {
           console.error("Failed to fetch user generated images:", error);
           return [];
@@ -60,21 +72,15 @@ import {
   }
  
 export default async function GalleryPage({ // Renommé de HistoryPage à GalleryPage pour plus de clarté
-
     params,
-    
     }: {
-    
-    params: Promise<{ lang: Language }>
-    
+    params: Promise<{ lang: Localy }>
     }) {
     
-    
-    
     const { lang } = await params;
-  
-      const session = await auth();
-      const userId = session?.user?.id;
+    const dict = await getDictionary(lang);
+    const session = await auth();
+    const userId = session?.user?.id;
   
       // --- Correction : Récupérer les deux types de données et les assigner ---
       let drawings: Drawing[] = [];
@@ -107,7 +113,7 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                         <BreadcrumbList>
                             <BreadcrumbItem className="hidden md:block"> <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink> </BreadcrumbItem>
                             <BreadcrumbSeparator className="hidden md:block" />
-                            <BreadcrumbItem> <BreadcrumbPage>Galerie</BreadcrumbPage> </BreadcrumbItem>
+                            <BreadcrumbItem> <BreadcrumbPage>{dict.gallery.title}</BreadcrumbPage> </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
                 </div>
@@ -118,8 +124,8 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                 <div className="mx-auto w-full max-w-6xl space-y-6">
                     {/* Titre */}
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Galerie</h1>
-                        <p className="text-muted-foreground">Vos créations et images générées.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">{dict.gallery.title}</h1>
+                        <p className="text-muted-foreground">{dict.gallery.subtitle}</p>
                     </div>
   
 
@@ -135,7 +141,7 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
              <AccordionItem value="item-generated-images">
                              {/* Utilisation de la variable 'generatedImages' maintenant déclarée */}
                              <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
-                                Mes Images Générées ({generatedImages.length})
+                                {dict.gallery.my_generated_images} ({generatedImages.length})
                             </AccordionTrigger>
                             <AccordionContent className="pt-4">
                                 {generatedImages.length > 0 ? (
@@ -148,9 +154,10 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                                                     url={image.imageUrl}
                                                     title={image.prompt ? (image.prompt.length > 50 ? image.prompt.substring(0, 47) + "..." : image.prompt) : (image.modelUsed || "Image générée")}
                                                     lang={lang}
+                                                    dictionary={dict}
                                                 />
                                             ) : (
-                                                 <div key={image.id} className="aspect-video bg-muted ..."> Image indisponible </div>
+                                                 <div key={image.id} className="aspect-video bg-muted ..."> {dict.gallery.image_unavailable} </div>
                                             )
                                         ))}
                                     </div>
@@ -160,7 +167,7 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                                     
                                     <p className="text-muted-foreground pt-4">
                                     
-                                    {userId ? "Vous n'avez pas encore généré d'images." : "Connectez-vous pour voir vos dessins."}
+                                    {userId ? dict.gallery.no_generated_images : dict.gallery.login_required}
                                     
                                     </p>
                                     
@@ -171,16 +178,16 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                         {/* --- Section Dessins --- */}
                         <AccordionItem value="item-drawings">
                             <AccordionTrigger className="text-xl font-semibold border rounded-md px-4 hover:bg-muted/50 data-[state=open]:bg-muted/50">
-                                Mes Dessins ({drawings.length})
+                                {dict.gallery.my_drawings} ({drawings.length})
                             </AccordionTrigger>
                             <AccordionContent className="pt-4">
                                 {drawings.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {drawings.map((drawing) => ( /* ... mapping des dessins ... */
                                             drawing.previewUrl ? (
-                                                <ImageThumbnail key={drawing.id} id={drawing.id} url={drawing.previewUrl} title={drawing.title} lang={lang} />
+                                                <ImageThumbnail key={drawing.id} id={drawing.id} url={drawing.previewUrl} title={drawing.title} lang={lang} dictionary={dict} />
                                             ) : (
-                                                <div key={drawing.id} className="aspect-video bg-muted ..."> Preview indisponible ... </div>
+                                                <div key={drawing.id} className="aspect-video bg-muted ..."> {dict.gallery.preview_unavailable} </div>
                                             )
                                         ))}
                                     </div>
@@ -190,7 +197,7 @@ export default async function GalleryPage({ // Renommé de HistoryPage à Galler
                                     
                                     <p className="text-muted-foreground pt-4">
                                     
-                                    {userId ? "Vous n'avez pas encore de dessins enregistrés." : "Connectez-vous pour voir vos dessins."}
+                                    {userId ? dict.gallery.no_drawings : dict.gallery.login_required}
                                     
                                     </p>
                                     

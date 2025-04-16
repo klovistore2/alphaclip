@@ -1,6 +1,6 @@
 //app/[lang]/dictionaries.ts
 
-import 'server-only'
+// Suppression de server-only pour permettre l'import côté client
  
 export type Localy = 'en' | 'fr';
 
@@ -46,6 +46,26 @@ export interface TypeDictionary {
     save_in_progress: string;
     save_error: string;
     save_success: string;
+  };
+  gallery: {
+    title: string;
+    subtitle: string;
+    my_drawings: string;
+    my_generated_images: string;
+    no_drawings: string;
+    no_generated_images: string;
+    login_required: string;
+    preview_unavailable: string;
+    image_unavailable: string;
+    thumbnail: {
+      view_full: string;
+      open_in_scribble: string;
+      open_in_variation: string;
+      open_in_image2video: string;
+      download: string;
+      options: string;
+      untitled: string;
+    }
   };
   nav?: {
     playground: string;

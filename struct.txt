@@ -44,3 +44,10 @@ aitubbb.com
 - passer d'un mode a l'autre
 - lang
 - prolong video
+- pop up shadcn quand la video est prete depuis le webhook
+- ajout du language toggle ds la sidebar
+- creer le lecteur youtube + side bar droite + fermer sidebar gauche
+- lien pour mobile ds la sidebar
+- text2image au moins 2 model
+- save as generated pour le canva
+- resend

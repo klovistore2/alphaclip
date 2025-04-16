@@ -35,6 +35,26 @@
       "paintStudio": "Paint Studio",
       "models": "Models"
     },
+    "gallery": {
+      "title": "Gallery",
+      "subtitle": "Your creations and generated images.",
+      "my_drawings": "My Drawings",
+      "my_generated_images": "My Generated Images",
+      "no_drawings": "You don't have any saved drawings yet.",
+      "no_generated_images": "You haven't generated any images yet.",
+      "login_required": "Sign in to view your drawings.",
+      "preview_unavailable": "Preview unavailable",
+      "image_unavailable": "Image unavailable",
+      "thumbnail": {
+        "view_full": "View full size",
+        "open_in_scribble": "Open in Scribble",
+        "open_in_variation": "Open in Variation",
+        "open_in_image2video": "Open in Image2Video",
+        "download": "Download",
+        "options": "Options",
+        "untitled": "Untitled"
+      }
+    },
     "metadata": { 
     "title": "yatubbb",
     "description": "Makes it easy to create and share AI-generated images and videos. You can create images from text, edit them, and even generate videos from images. The platform is user-friendly and offers a variety of tools to enhance your creative process."
