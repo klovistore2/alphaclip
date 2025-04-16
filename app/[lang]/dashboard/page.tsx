@@ -66,7 +66,7 @@ export default async function Page({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
             {publicVideos.map((video) => (
               // Passer les données nécessaires à la carte de vignette
-              <VideoThumbnailCard key={video.id} video={video} lang={lang} />
+              <VideoThumbnailCard key={video.id} video={video} lang={lang} dictionary={dict} />
             ))}
           </div>
         )}

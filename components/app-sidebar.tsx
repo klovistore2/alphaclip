@@ -34,7 +34,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   lang: Localy;
 }
 
-export function AppSidebar({ data, lang, ...props }: AppSidebarProps) {
+export function AppSidebar({ data, ...props }: AppSidebarProps) {
   // Utiliser les traductions de la sidebar
 
 

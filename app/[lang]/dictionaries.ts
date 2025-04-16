@@ -210,6 +210,20 @@ export interface TypeDictionary {
   userNav: {
     profile: string;
     settings: string;
+    signIn?: string;
+    loading?: string;
+    account?: string;
+    billing?: string;
+    upgrade?: string;
+    logOut?: string;
+  };
+  videoCard?: {
+    untitled: string;
+    unknownUser: string;
+    views: string;
+    download: string;
+    share: string;
+    options: string;
   };
 }
 

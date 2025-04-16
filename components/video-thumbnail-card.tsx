@@ -2,7 +2,7 @@
 "use client";
 
 import Image from 'next/image';
-import { useState } from 'react'; // Pour l'état de survol (facultatif)
+import { useState, useEffect } from 'react'; // Pour l'état de survol et le chargement du dictionnaire
 //import { useRouter } from 'next/navigation'; // Ou next/link pour la navigation
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale'; // Importer la locale française
@@ -16,25 +16,44 @@ import 'next-cloudinary/dist/cld-video-player.css';
 
 // Importer le type depuis page.tsx ou le redéfinir ici
 import type { VideoWithUserData } from '@/app/[lang]/dashboard/page'; // Ajustez le chemin
+import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 interface VideoThumbnailCardProps {
   video: VideoWithUserData;
-  lang: string;
+  lang: Localy;
+  dictionary?: TypeDictionary;
 }
 
 // Fonction pour formater les vues (simple exemple)
-function formatViews(views: number | undefined | null): string {
+function formatViews(views: number | undefined | null, viewsText: string): string {
     if (views === undefined || views === null) return '';
-    if (views < 1000) return `${views} vues`;
-    if (views < 1000000) return `${Math.floor(views / 1000)} k vues`;
-    return `${(views / 1000000).toFixed(1)} M de vues`;
+    if (views < 1000) return `${views} ${viewsText}`;
+    if (views < 1000000) return `${Math.floor(views / 1000)} k ${viewsText}`;
+    return `${(views / 1000000).toFixed(1)} M ${viewsText}`;
 }
 
-export function VideoThumbnailCard({ video, lang }: VideoThumbnailCardProps) {
+export function VideoThumbnailCard({ video, lang, dictionary }: VideoThumbnailCardProps) {
     //const router = useRouter();
     const [isHovering, setIsHovering] = useState(false);
-
-    console.log("Langue courante dans VideoThumbnailCard:", lang);
+    const [dict, setDict] = useState<TypeDictionary | null>(null);
+    
+    // Load dictionary if not provided
+    useEffect(() => {
+        async function loadDictionary() {
+            if (!dictionary) {
+                const loadedDict = await getDictionary(lang);
+                setDict(loadedDict);
+            }
+        }
+        loadDictionary();
+    }, [lang, dictionary]);
+    
+    // Use provided dictionary or loaded one
+    const translations = dictionary || dict;
+    
+    // Don't render until dictionary is available
+    if (!translations) return null;
+    
     // Vérifier si les données nécessaires sont présentes
     if (!video.cloudinaryPublicId || !video.user || !video.videoUrl) {
         // Peut-être afficher une carte d'erreur ou retourner null
@@ -132,15 +151,15 @@ export function VideoThumbnailCard({ video, lang }: VideoThumbnailCardProps) {
                     <h3 className="text-sm font-medium leading-snug DrukTextWideCy W_90 Web_H7 N_4 VAD6 qJcS8d">
                         {/* Limiter le nombre de lignes pour le titre */}
                         <span className="block max-h-[2.8em] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
-                            {video.title || "Vidéo sans titre"}
+                            {video.title || translations.videoCard?.untitled || "Untitled video"}
                         </span>
                     </h3>
                     <div className="text-xs text-muted-foreground mt-1">
-                        <p className="truncate">{video.user?.name || "Utilisateur inconnu"}</p>
+                        <p className="truncate">{video.user?.name || translations.videoCard?.unknownUser || "Unknown user"}</p>
                         <div className="flex items-center space-x-1">
                              {/* Afficher les vues si le champ existe */}
                              {typeof video.views === 'number' && (
-                                 <span>{formatViews(video.views)}</span>
+                                 <span>{formatViews(video.views, translations.videoCard?.views || "views")}</span>
                              )}
                              {typeof video.views === 'number' && <span>•</span>}
                             <span>{timeAgo}</span>
@@ -155,18 +174,18 @@ export function VideoThumbnailCard({ video, lang }: VideoThumbnailCardProps) {
                         <DropdownMenuTrigger asChild>
                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
                                  <MoreVertical className="h-4 w-4" />
-                                 <span className="sr-only">Options</span>
+                                 <span className="sr-only">{translations.videoCard?.options || "Options"}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                             <DropdownMenuItem onClick={handleDownload}>
                                 <Download className="mr-2 h-4 w-4" />
-                                Télécharger
+                                {translations.videoCard?.download || "Download"}
                             </DropdownMenuItem>
                              {/* Ajouter d'autres options */}
                              <DropdownMenuItem onClick={() => alert('Partager (à implémenter)')}>
                                 <Share2 className="mr-2 h-4 w-4" />
-                                Partager
+                                {translations.videoCard?.share || "Share"}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

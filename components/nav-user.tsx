@@ -57,7 +57,7 @@ export function NavUser({
         <SidebarMenuItem>
           <Button variant="outline" onClick={() => signIn()} className="w-full">
             <LogIn className="mr-2 h-4 w-4" />
-            Sign In
+            {dictionary?.userNav?.signIn || "Sign In"}
           </Button>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -74,7 +74,7 @@ export function NavUser({
               <AvatarFallback className="rounded-lg">...</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">Loading...</span>
+              <span className="truncate font-medium">{dictionary?.userNav?.loading || "Loading..."}</span>
             </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -89,9 +89,17 @@ export function NavUser({
     avatar: session?.user?.image || "",
   }
 
-  // Valeurs par défaut si dictionary n'est pas fourni
-  const profile = dictionary?.userNav?.profile || "Profile";
-  const settings = dictionary?.userNav?.settings || "Settings";
+  // Valeurs par défaut si dictionary n'est pas fourni ou si les clés sont manquantes
+  const translations = {
+    profile: dictionary?.userNav?.profile || "Profile",
+    settings: dictionary?.userNav?.settings || "Settings",
+    signIn: dictionary?.userNav?.signIn || "Sign In",
+    loading: dictionary?.userNav?.loading || "Loading...",
+    account: dictionary?.userNav?.account || "Account",
+    billing: dictionary?.userNav?.billing || "Billing",
+    upgrade: dictionary?.userNav?.upgrade || "Upgrade to Pro",
+    logOut: dictionary?.userNav?.logOut || "Log out"
+  };
 
   return (
     <SidebarMenu>
@@ -139,32 +147,32 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
-                Upgrade to Pro
+                {translations.upgrade}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <User />
-                {profile}
+                {translations.profile}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BadgeCheck />
-                Account
+                {translations.account}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
-                Billing
+                {translations.billing}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
-                {settings}
+                {translations.settings}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut()}>
               <LogOut />
-              Log out
+              {translations.logOut}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

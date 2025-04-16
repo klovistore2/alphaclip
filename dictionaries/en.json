@@ -194,7 +194,21 @@
       "improveVideo_makeLonger": "Extend Video"
     },
     "userNav": { 
-      "profile": "Profil",
-      "settings": "Settings"
+      "profile": "Profile",
+      "settings": "Settings",
+      "signIn": "Sign In",
+      "loading": "Loading...",
+      "account": "Account",
+      "billing": "Billing",
+      "upgrade": "Upgrade to Pro",
+      "logOut": "Log out"
+    },
+    "videoCard": {
+      "untitled": "Untitled video",
+      "unknownUser": "Unknown user",
+      "views": "views",
+      "download": "Download",
+      "share": "Share",
+      "options": "Options"
     }
 }

@@ -195,6 +195,20 @@
   },
   "userNav": {
     "profile": "Profil",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "signIn": "Se Connecter",
+    "loading": "Chargement...",
+    "account": "Compte",
+    "billing": "Facturation",
+    "upgrade": "Passer à Pro",
+    "logOut": "Déconnexion"
+  },
+  "videoCard": {
+    "untitled": "Vidéo sans titre",
+    "unknownUser": "Utilisateur inconnu",
+    "views": "vues",
+    "download": "Télécharger",
+    "share": "Partager",
+    "options": "Options"
   }
 }
