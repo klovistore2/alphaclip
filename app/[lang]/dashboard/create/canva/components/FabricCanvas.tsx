@@ -39,13 +39,16 @@ function dataURLtoFile(dataurl: string, filename: string): File | null {
 // ------------------------------------------------------
 
 // --- Interface pour les Props du Composant ---
+import { Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
+
 interface FabricCanvasProps {
-    lang: string; // Pour construire l'URL de redirection
+    lang: Localy; // Pour construire l'URL de redirection
+    dictionary?: TypeDictionary; // Dictionnaire de traductions
 }
 // -------------------------------------------
 
 // --- Définition UNIQUE et CORRIGÉE du Composant ---
-const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang }) => {
+const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
     // --- Hooks (Refs, State, Router) ---
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
@@ -56,6 +59,9 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang }) => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [saveMessage, setSaveMessage] = useState<string | null>(null);
     const router = useRouter(); // Initialiser le routeur ici
+    
+    // Utiliser le dictionnaire passé en prop
+    const dict = dictionary;
 
     // --- Effet Principal (Setup + Keydown Listener) ---
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -283,9 +289,9 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang }) => {
    
     // --- Fonction de Sauvegarde ---
     const handleSave = async () => {
-        if (!fabricCanvasRef.current || isSaving) return;
+        if (!fabricCanvasRef.current || isSaving || !dict) return;
         setIsSaving(true);
-        setSaveMessage("Sauvegarde en cours...");
+        setSaveMessage(dict.canva.save_in_progress);
         try {
             const canvas = fabricCanvasRef.current;
             const imageDataUrl = canvas.toDataURL({ format: 'png', quality: 0.9 });
@@ -300,7 +306,7 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang }) => {
             const result = await saveDrawingAction(imageFile, canvasState);
 
             if (result?.success && result.drawingId) {
-                setSaveMessage("Dessin sauvegardé ! Redirection...");
+                setSaveMessage(dict.canva.save_success);
                 router.push(`/${lang}/dashboard/image2image/scribble/${result.drawingId}`);
                 // Pas besoin de setIsSaving(false) ici, la navigation se produit
             } else {
@@ -308,7 +314,7 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang }) => {
             }
         } catch (error) {
             console.error("Save failed:", error);
-            setSaveMessage(`Erreur : ${error instanceof Error ? error.message : String(error)}`);
+            setSaveMessage(`${dict.canva.save_error}${error instanceof Error ? error.message : String(error)}`);
             setIsSaving(false); // Termine le chargement seulement en cas d'erreur
             setTimeout(() => setSaveMessage(null), 5000);
         }
@@ -318,47 +324,73 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang }) => {
     return (
         <div className="flex flex-col h-full w-full max-h-full max-w-full">
             {/* Barre d'outils */}
+            {dict && (
             <div className="flex gap-2 p-2 border-b bg-background shrink-0 items-center flex-wrap">
                 {/* Bouton Sélection */}
-                <Button variant={activeTool === 'select' ? "secondary" : "outline"} size="sm" onClick={activateSelectMode} disabled={isSaving}> Sélection </Button>
+                <Button variant={activeTool === 'select' ? "secondary" : "outline"} size="sm" onClick={activateSelectMode} disabled={isSaving}>
+                    {dict.canva.selection}
+                </Button>
 
                 {/* Menu Déroulant Stylo */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant={activeTool === 'pen' ? "secondary" : "outline"} size="sm" disabled={isSaving}> Stylo </Button>
+                        <Button variant={activeTool === 'pen' ? "secondary" : "outline"} size="sm" disabled={isSaving}>
+                            {dict.canva.pen}
+                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuLabel>Épaisseur</DropdownMenuLabel>
+                        <DropdownMenuLabel>{dict.canva.thickness}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onSelect={() => activatePen(1)} disabled={isSaving}> Fin (1px) {penWidth === 1 && activeTool === 'pen' && "✓"} </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => activatePen(3)} disabled={isSaving}> Moyen (3px) {penWidth === 3 && activeTool === 'pen' && "✓"} </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => activatePen(8)} disabled={isSaving}> Épais (8px) {penWidth === 8 && activeTool === 'pen' && "✓"} </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => activatePen(1)} disabled={isSaving}>
+                            {dict.canva.thin} {penWidth === 1 && activeTool === 'pen' && "✓"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => activatePen(3)} disabled={isSaving}>
+                            {dict.canva.medium} {penWidth === 3 && activeTool === 'pen' && "✓"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => activatePen(8)} disabled={isSaving}>
+                            {dict.canva.thick} {penWidth === 8 && activeTool === 'pen' && "✓"}
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                 {/* Menu Déroulant Formes */}
-                 <DropdownMenu>
+                {/* Menu Déroulant Formes */}
+                <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" disabled={isSaving}> Formes </Button>
+                        <Button variant="outline" size="sm" disabled={isSaving}>
+                            {dict.canva.shapes}
+                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem onSelect={addRectangle} disabled={isSaving}>Carré</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={addCircle} disabled={isSaving}>Rond</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={addTriangle} disabled={isSaving}>Triangle</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={addLine} disabled={isSaving}>Barre (Ligne)</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addRectangle} disabled={isSaving}>
+                            {dict.canva.square}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addCircle} disabled={isSaving}>
+                            {dict.canva.circle}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addTriangle} disabled={isSaving}>
+                            {dict.canva.triangle}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={addLine} disabled={isSaving}>
+                            {dict.canva.line}
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 
                 {/* Bouton Importer Image */}
-                <Button variant="outline" size="sm" onClick={handleImageUploadClick} disabled={isSaving}> Importer Image </Button>
+                <Button variant="outline" size="sm" onClick={handleImageUploadClick} disabled={isSaving}>
+                    {dict.canva.import_image}
+                </Button>
                 <Input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageFileChange} className="hidden" />
 
                 {/* Bouton Enregistrer */}
-                <Button variant="default" size="sm" onClick={handleSave} disabled={isSaving} > {isSaving ? "Sauvegarde..." : "Enregistrer"} </Button>
+                <Button variant="default" size="sm" onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? dict.canva.saving : dict.canva.save}
+                </Button>
 
-                 {/* Message de sauvegarde */}
-                 {saveMessage && <span className="text-sm ml-2 text-muted-foreground">{saveMessage}</span>}
+                {/* Message de sauvegarde */}
+                {saveMessage && <span className="text-sm ml-2 text-muted-foreground">{saveMessage}</span>}
             </div>
+            )}
 
             {/* Conteneur DU CANEVAS */}
             <div

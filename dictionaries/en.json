@@ -9,6 +9,26 @@
       "prompt": "Enter a text prompt to generate an image.",
       "button": "Generate Image"
     },
+    "canva": {
+      "title": "Canvas Drawing",
+      "selection": "Selection",
+      "pen": "Pen",
+      "thickness": "Thickness",
+      "thin": "Thin (1px)",
+      "medium": "Medium (3px)",
+      "thick": "Thick (8px)",
+      "shapes": "Shapes",
+      "square": "Square",
+      "circle": "Circle",
+      "triangle": "Triangle",
+      "line": "Line",
+      "import_image": "Import Image",
+      "save": "Save",
+      "saving": "Saving...",
+      "save_in_progress": "Save in progress...",
+      "save_error": "Error: ",
+      "save_success": "Drawing saved! Redirecting..."
+    },
     "nav": {
       "playground": "Playground",
       "playgroundAI": "Playground AI",

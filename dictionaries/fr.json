@@ -9,6 +9,26 @@
     "prompt": "Entrez une description textuelle pour générer une image.",
     "button": "Générer une image"
   },
+  "canva": {
+    "title": "Dessin sur Canvas",
+    "selection": "Sélection",
+    "pen": "Stylo",
+    "thickness": "Épaisseur",
+    "thin": "Fin (1px)",
+    "medium": "Moyen (3px)",
+    "thick": "Épais (8px)",
+    "shapes": "Formes",
+    "square": "Carré",
+    "circle": "Rond",
+    "triangle": "Triangle",
+    "line": "Barre (Ligne)",
+    "import_image": "Importer Image",
+    "save": "Enregistrer",
+    "saving": "Sauvegarde...",
+    "save_in_progress": "Sauvegarde en cours...",
+    "save_error": "Erreur : ",
+    "save_success": "Dessin sauvegardé ! Redirection..."
+  },
   "nav": {
     "playground": "Terrain de jeu",
     "playgroundAI": "Terrain de jeu IA",

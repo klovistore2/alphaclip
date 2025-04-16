@@ -49,7 +49,7 @@ return (
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Canva</BreadcrumbPage>
+                  <BreadcrumbPage>{dict.canva.title}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -60,7 +60,7 @@ return (
         <div className="flex flex-col h-full w-full gap-2 p-4">
               {/* Ajoutez d'autres éléments ici si nécessaire */}
               <div className="flex flex-1 justify-center items-center bg-muted rounded-xl border overflow-hidden">
-              <FabricCanvas lang={lang} />
+              <FabricCanvas lang={lang} dictionary={dict} />
            </div>
         </div>
 

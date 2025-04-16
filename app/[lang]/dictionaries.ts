@@ -27,6 +27,26 @@ export interface TypeDictionary {
     prompt: string;
     button: string;
   };
+  canva: {
+    title: string;
+    selection: string;
+    pen: string;
+    thickness: string;
+    thin: string;
+    medium: string;
+    thick: string;
+    shapes: string;
+    square: string;
+    circle: string;
+    triangle: string;
+    line: string;
+    import_image: string;
+    save: string;
+    saving: string;
+    save_in_progress: string;
+    save_error: string;
+    save_success: string;
+  };
   nav?: {
     playground: string;
     playgroundAI: string;
