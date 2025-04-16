@@ -58,10 +58,7 @@ export function VideoCard({ video }: VideoCardProps) {
   };
 
   const handleAddSound = () => {
-    // Logique pour "Ajouter du son"
-    // Pour l'instant, juste une alerte.
-    // Plus tard, cela pourrait ouvrir un modal, ou rediriger vers une page d'édition
-    // en passant l'ID de la vidéo : /edit-video/{video.id}/sound
+
     router.push(`/dashboard/improvevideo/addsound/${video.id}`)
 
   };
@@ -73,7 +70,7 @@ export function VideoCard({ video }: VideoCardProps) {
       {/* Ajout de padding (p-2) autour du lecteur vidéo */}
       <CardContent className="p-2 aspect-video"> {/* p-2 crée la marge autour du lecteur */}
         <CldVideoPlayer
-          id={`player-${video.id}`}
+          id={`${video.id}`}
           width="1920"
           height="1080"
           src={video.cloudinaryPublicId}

@@ -2,17 +2,15 @@
 
 import * as React from "react"
 import {
-
   BookOpen,
   Pencil,
   ImagePlus,
-  Frame,
+  //Frame,
   Video,
-  Map,
-  PieChart,
+  //Map,
+  //PieChart,
   Film,
   //Music,
-
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -29,134 +27,104 @@ import {
 } from "@/components/ui/sidebar"
 
 import { ModeToggle } from "@/components/theme-toggle"
+import { Localy, TypeDictionary } from '@/app/[lang]/dictionaries'; 
 
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  data: TypeDictionary;
+  lang: Localy;
+}
 
-// This is sample data.
-const data = {
-  user: {
-    name: "ClipDraw",
-    email: "@mail",
-    avatar: "/avatars/shadcn.jpg",
-  },
+export function AppSidebar({ data, lang, ...props }: AppSidebarProps) {
+  // Utiliser les traductions de la sidebar
 
-  navMain: [
+  
+  console.log("AppSidebar lang", lang); 
+  const navMainItems = [
     {
-      title: "Gallery",
+      title: data.sidebar.gallery,
       url: "#",
       icon: BookOpen,
-      //isActive: true,
       items: [
         {
-          title: "Image",
-          url: "/dashboard//gallery//image",
+          title: data.sidebar.gallery_image,
+          url: "/dashboard/gallery/image",
         },
         {
-          title: "Video",
-          url: "/dashboard//gallery//videos",
+          title: data.sidebar.gallery_video,
+          url: "/dashboard/gallery/videos",
         },
       ],
     },
     {
-      title: "Create Image",
+      title: data.sidebar.createImage,
       url: "#",
       icon: Pencil,
       items: [
-
         {
-          title: "Canva",
-          url: "/dashboard//create//canva",
+          title: data.sidebar.createImage_canva,
+          url: "/dashboard/create/canva",
         },
-
       ],
     },
     {
-      title: "Image to Image",
+      title: data.sidebar.imageToImage,
       url: "#",
       icon: ImagePlus,
       items: [
         {
-          title: "Scribble",
-          url: "/dashboard//image2image//scribble//0",
+          title: data.sidebar.imageToImage_scribble,
+          url: "/dashboard/image2image/scribble/0",
         },
         {
-          title: "Variationa",
-          url: "/dashboard//image2image//variation//0",
+          title: data.sidebar.imageToImage_variation,
+          url: "/dashboard/image2image/variation/0",
         },
       ],
     },
     {
-      title: "Generate Video",
+      title: data.sidebar.generateVideo,
       url: "#",
       icon: Video,
       items: [
         {
-          title: "Image to Video",
-          url: "/dashboard//videogenerate//image2video//0",
+          title: data.sidebar.generateVideo_imageToVideo,
+          url: "/dashboard/videogenerate/image2video/0",
         },
       ],
     },
     {
-      title: "Improve Video",
+      title: data.sidebar.improveVideo,
       url: "#",
       icon: Film,
       items: [
-
         {
-          title: "Add AI Sound",
-          url: "/dashboard//improvevideo//addsound//0",
+          title: data.sidebar.improveVideo_addSound,
+          url: "/dashboard/improvevideo/addsound/0",
         },
         {
-          title: "Make it longer",
-          url: "/dashboard//improvevideo//extend//0",
+          title: data.sidebar.improveVideo_makeLonger,
+          url: "/dashboard/improvevideo/extend/0",
         },
       ],
     },
-    
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
-//<NavProjects projects={data.projects} />
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  ];
   
   return (
     <Sidebar collapsible="icon" {...props}>
-    <SidebarTrigger className="-ml-1" />
-    <SidebarHeader>
-
+      <SidebarTrigger className="-ml-1" />
+      <SidebarHeader>
       </SidebarHeader>
       
       <SidebarContent>
-        
-        <NavMain items={data.navMain} />
-        
+        <NavMain items={navMainItems} />
       </SidebarContent>
       
       <SidebarFooter>
-        
         <ModeToggle />
-
-        <NavUser />
-      
+        <NavUser dictionary={data} />
       </SidebarFooter>
       
       <SidebarRail />
-    
     </Sidebar>
   )
 }

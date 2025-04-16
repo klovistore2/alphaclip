@@ -4,7 +4,7 @@
       "text": "Texte"
     },
     "create_image": {
-      "title": "Create Image en",
+      "title": "Create Image",
       "description": "Create an image using a text prompt.",
       "prompt": "Enter a text prompt to generate an image.",
       "button": "Generate Image"
@@ -14,5 +14,28 @@
       "playgroundAI": "Playground AI",
       "paintStudio": "Paint Studio",
       "models": "Models"
+    },
+    "metadata": { 
+    "title": "yatubbb",
+    "description": "Makes it easy to create and share AI-generated images and videos. You can create images from text, edit them, and even generate videos from images. The platform is user-friendly and offers a variety of tools to enhance your creative process."
+    },
+    "sidebar": {
+      "gallery": "Gallery",
+      "gallery_image": "Image",
+      "gallery_video": "Video",
+      "createImage": "Create Image",
+      "createImage_canva": "Canva",
+      "imageToImage": "Image to Image",
+      "imageToImage_scribble": "Scribble",
+      "imageToImage_variation": "Image Variation",
+      "generateVideo": "Generate Videos",
+      "generateVideo_imageToVideo": "Image to Video",
+      "improveVideo": "Improve Video",
+      "improveVideo_addSound": "Add Sound",
+      "improveVideo_makeLonger": "Extend Video"
+    },
+    "userNav": { 
+      "profile": "Profil",
+      "settings": "Settings"
     }
-  }
+}

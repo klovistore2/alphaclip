@@ -1,12 +1,41 @@
 {
-    "products": {
-      "cart": "Ajouter au panier",
-      "text": "Texte"
-    },
-    "create_image": {
-      "title": "Create Image fr",
-      "description": "Create an image using a text prompt.",
-      "prompt": "Enter a text prompt to generate an image.",
-      "button": "Generate Image"
-    }
+  "products": {
+    "cart": "Ajouter au panier",
+    "text": "Texte"
+  },
+  "create_image": {
+    "title": "Créer une image",
+    "description": "Créez une image à partir d'une description textuelle.",
+    "prompt": "Entrez une description textuelle pour générer une image.",
+    "button": "Générer une image"
+  },
+  "nav": {
+    "playground": "Terrain de jeu",
+    "playgroundAI": "Terrain de jeu IA",
+    "paintStudio": "Studio de peinture",
+    "models": "Modèles"
+  },
+  "metadata": {
+    "title": "yatubbb",
+    "description": "Facilite la création et le partage d'images et de vidéos générées par l'IA. Vous pouvez créer des images à partir de texte, les modifier et même générer des vidéos à partir d'images. La plateforme est conviviale et offre une variété d'outils pour améliorer votre processus créatif."
+  },
+  "sidebar": {
+    "gallery": "Galerie",
+    "gallery_image": "Image",
+    "gallery_video": "Vidéo",
+    "createImage": "Créer une Image",
+    "createImage_canva": "Canva",
+    "imageToImage": "Image à Image",
+    "imageToImage_scribble": "Gribouillage",
+    "imageToImage_variation": "Variation d'image",
+    "generateVideo": "Générer des vidéos",
+    "generateVideo_imageToVideo": "Image à Vidéo",
+    "improveVideo": "Améliorer la vidéo",
+    "improveVideo_addSound": "Ajouter du son",
+    "improveVideo_makeLonger": "Prolonger la vidéo"
+  },
+  "userNav": {
+    "profile": "Profil",
+    "settings": "Paramètres"
   }
+}

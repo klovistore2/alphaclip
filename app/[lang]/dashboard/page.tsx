@@ -1,55 +1,99 @@
+// app/[lang]/page.tsx
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  //SidebarTrigger,
-} from "@/components/ui/sidebar"
+import { getDictionary, Localy } from '../dictionaries'
+//import Link from 'next/link'
+//import { LanguageSwitcher } from '@/components/language-switcher'
 
-export default function Page() {
+import { prisma } from '@/lib/prisma';
+import { AssetStatus } from '@prisma/client';
+import { VideoThumbnailCard } from '@/components/video-thumbnail-card'; // On va créer ce composant
+import { Prisma } from '@prisma/client';
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ lang: Localy }>
+}) {
+  
+  const { lang } = await params
+  
+  const dict = await getDictionary(lang) 
+
+  console.log("langue courante",dict.metadata.title) 
+  // Récupérer les vidéos publiques, complétées, avec infos utilisateur
+  const publicVideos = await prisma.generatedVideo.findMany({
+    where: {
+      public: true,           // Uniquement les vidéos publiques
+      status: AssetStatus.COMPLETED, // Uniquement celles qui sont prêtes
+      isDeleted: false,       // Uniquement celles non supprimées
+      cloudinaryPublicId: {  // S'assurer qu'on a l'ID pour la vignette
+        not: null,
+      },
+      videoUrl: {           // S'assurer qu'on a l'URL pour le téléchargement
+        not: null,
+      }
+    },
+    include: {
+      // Inclure les données de l'utilisateur associé
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true, // URL de l'avatar de l'utilisateur
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc', // Trier par date de création (plus récentes d'abord)
+      // ou par 'views: 'desc'` si vous ajoutez le champ views
+    },
+    // Limiter le nombre pour la pagination future ? ex: take: 20
+  });
+
   return (
+    // Adapter cette structure à votre layout global avec Sidebar
+    <div className="flex h-full">
+      {/* <Sidebar /> */} {/* Votre Sidebar existante ici */}
 
+      {/* Zone de contenu principal */}
+      <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
+        <h1 className="text-2xl font-semibold mb-6">Vidéos Publiques</h1>
 
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-           
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Generate your perfect video
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Home</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+        {publicVideos.length === 0 ? (
+          <p className="text-muted-foreground">Aucune vidéo publique à afficher pour le moment.</p>
+        ) : (
+          // Grille style YouTube
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">
+            {publicVideos.map((video) => (
+              // Passer les données nécessaires à la carte de vignette
+              <VideoThumbnailCard key={video.id} video={video} lang={lang} />
+            ))}
           </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <p> Create Ai clips with audio, ads, lipsync and much more ! </p>
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-        </div>
-      </SidebarInset>
-
-  )
+        )}
+      </main>
+    </div>
+  );
 }
+
+
+export type VideoWithUserData = Prisma.GeneratedVideoGetPayload<{
+  include: {
+      user: {
+          select: {
+              id: true,
+              name: true,
+              image: true,
+          }
+      }
+  }
+}> & {
+  id: string;
+  title: string | null;
+  // --- MODIFICATION ICI ---
+  // Accepter string | null, comme retourné par Prisma, même si on sait que ce sera string ici
+  cloudinaryPublicId: string | null;
+  videoUrl: string | null;
+  // --- FIN MODIFICATION ---
+  createdAt: Date;
+  views?: number;
+};

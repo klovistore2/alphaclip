@@ -33,16 +33,20 @@ import {
 } from "@/components/ui/sidebar"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
+import { TypeDictionary } from '@/app/[lang]/dictionaries'
 
-export function NavUser({
-  //user,
-}: {
+interface NavUserProps {
   user?: {
     name: string
     email: string
     avatar: string
   }
-}) {
+  dictionary?: TypeDictionary
+}
+
+export function NavUser({
+  dictionary,
+}: NavUserProps) {
   const { isMobile } = useSidebar()
   const { data: session, status } = useSession()
   
@@ -84,6 +88,10 @@ export function NavUser({
     email: session?.user?.email || "",
     avatar: session?.user?.image || "",
   }
+
+  // Valeurs par défaut si dictionary n'est pas fourni
+  const profile = dictionary?.userNav?.profile || "Profile";
+  const settings = dictionary?.userNav?.settings || "Settings";
 
   return (
     <SidebarMenu>
@@ -138,7 +146,7 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <User />
-                Profile
+                {profile}
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BadgeCheck />
@@ -150,7 +158,7 @@ export function NavUser({
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
-                Notifications
+                {settings}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
