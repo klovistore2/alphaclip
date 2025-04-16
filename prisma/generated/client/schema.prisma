@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+model User {
+  id              String           @id @default(cuid())
+  name            String?
+  username        String?          @unique
+  email           String?          @unique
+  emailVerified   DateTime?
+  image           String?
+  accounts        Account[]
+  sessions        Session[]
+  authenticators  Authenticator[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  drawings        Drawing[] // Les dessins créés par l'utilisateur
+  generatedImages GeneratedImage[] // Les images générées par l'utilisateur
+  generatedVideos GeneratedVideo[] // Les vidéos générées par l'utilisateur
+  generatedAudios GeneratedAudio[] // Les audios générés par l'utilisateur
+  generationLogs  GenerationLog[] // L'historique des générations IA
+}
+
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+// Représente un dessin/brouillon initial fait par l'utilisateur
+model Drawing {
+  id         String        @id @default(cuid())
+  title      String? // Titre donné par l'utilisateur
+  content    Json? // Stockage de l'état du canvas (format JSON de Konva/Fabric)
+  previewUrl String? // URL d'une miniature/preview générée
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  isDeleted  Boolean       @default(false) // Pour la corbeille (soft delete)
+  status     DrawingStatus @default(DRAFT) // Statut actuel du projet
+
+  // Relation avec l'utilisateur propriétaire
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations avec les assets générés à partir de ce dessin
+  generatedImages GeneratedImage[]
+  generationLogs  GenerationLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([isDeleted])
+}
+
+// Représente une image générée par IA (depuis un dessin ou une autre image)
+model GeneratedImage {
+  id                    String      @id @default(cuid())
+  imageUrl              String // URL de l'image stockée (ex: S3, Cloudinary)
+  width                 Int?
+  height                Int?
+  prompt                String?     @db.Text // Prompt utilisé pour la génération
+  modelUsed             String? // Modèle IA utilisé (ex: 'stable-diffusion-xl')
+  parameters            Json? // Paramètres IA utilisés (seed, strength, etc.)
+  status                AssetStatus @default(PENDING) // Statut de génération
+  replicatePredictionId String?     @unique // ID de la tâche Replicate (si applicable)
+  createdAt             DateTime    @default(now())
+  isDeleted             Boolean     @default(false)
+  title                 String? // Titre de la vidéo (optionnel)
+  // Relation avec l'utilisateur
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relation avec la source (peut venir d'un dessin OU d'une autre image)
+  sourceDrawingId String?
+  sourceDrawing   Drawing? @relation(fields: [sourceDrawingId], references: [id], onDelete: SetNull)
+
+  sourceImageId String? // Pour les cas d'upscale ou image-to-image
+  sourceImage   GeneratedImage?  @relation("ImageToImageSource", fields: [sourceImageId], references: [id], onDelete: SetNull, map: "source_image_id")
+  derivedImages GeneratedImage[] @relation("ImageToImageSource") // Images dérivées de celle-ci
+
+  // Relation avec les vidéos générées à partir de cette image
+  generatedVideos GeneratedVideo[]
+  generationLogs  GenerationLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([sourceDrawingId])
+  @@index([sourceImageId])
+  @@index([isDeleted])
+}
+
+// Représente une vidéo générée par IA (depuis une image)
+model GeneratedVideo {
+  id                    String      @id @default(cuid())
+  cloudinaryPublicId    String? // ID Public Cloudinary
+  videoUrl              String? // URL de la vidéo stockée (devrait être optionnel '?' si statut PENDING/FAILED)
+  duration              Float? // Durée en secondes
+  prompt                String?     @db.Text // Prompt utilisé (pour image2video ou sound)
+  modelUsed             String? // Modèle IA utilisé
+  parameters            Json? // Paramètres IA divers (peut encore être utile pour d'autres choses)
+  status                AssetStatus @default(PENDING)
+  replicatePredictionId String?     @unique
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt // Ajouter la date de mise à jour
+  isDeleted             Boolean     @default(false)
+  public                Boolean     @default(false)
+  title                 String?
+  description           String?
+
+  // Relation avec l'utilisateur
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relation avec l'image source (si applicable)
+  // Rendre optionnel si une vidéo peut exister sans image source (ex: text2video)
+  sourceImageId String? // << Rendu optionnel ?
+  sourceImage   GeneratedImage? @relation(fields: [sourceImageId], references: [id], onDelete: SetNull) // << Changé onDelete en SetNull
+
+  // Relation avec l'audio généré (si applicable)
+  generatedAudio GeneratedAudio? // Assurez-vous que ce modèle existe si vous le référencez
+  sound          Boolean         @default(false) // la video a-t-elle un son ?
+
+  // --- AJOUTS pour la relation Parent/Enfant ---
+  parentVideoId String? // Clé étrangère vers la vidéo parente (optionnelle)
+  parentVideo   GeneratedVideo?  @relation("VideoEdits", fields: [parentVideoId], references: [id], onDelete: SetNull) // Relation vers le parent (nommée "VideoEdits")
+  childVideos   GeneratedVideo[] @relation("VideoEdits") // Relation vers les enfants (vidéos dérivées)
+
+  // Relation avec les logs
+  generationLogs GenerationLog[] // Assurez-vous que GenerationLog existe
+
+  @@index([userId])
+  @@index([status])
+  @@index([sourceImageId])
+  @@index([isDeleted])
+  @@index([parentVideoId]) // << Index ajouté pour la nouvelle clé étrangère
+}
+
+// Représente un audio généré par IA (pour une vidéo)
+model GeneratedAudio {
+  id                    String      @id @default(cuid())
+  audioUrl              String // URL de l'audio stocké
+  modelUsed             String? // Modèle IA utilisé
+  parameters            Json? // Paramètres IA
+  status                AssetStatus @default(PENDING)
+  replicatePredictionId String?     @unique
+  createdAt             DateTime    @default(now())
+  isDeleted             Boolean     @default(false)
+
+  // Relation avec l'utilisateur
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relation avec la vidéo associée (supposons 1 audio par vidéo)
+  videoId String         @unique // Assure qu'un audio n'est lié qu'à une seule vidéo
+  video   GeneratedVideo @relation(fields: [videoId], references: [id], onDelete: Cascade) // Même remarque que pour GeneratedVideo sur Cascade
+
+  generationLogs GenerationLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([videoId])
+  @@index([isDeleted])
+}
+
+// Modèle optionnel mais utile pour tracer chaque appel IA
+model GenerationLog {
+  id                    String      @id @default(cuid())
+  type                  String // Type de génération (ex: 'DRAWING_TO_IMAGE', 'IMAGE_UPSACLE', 'IMAGE_TO_VIDEO', 'VIDEO_TO_AUDIO')
+  prompt                String?     @db.Text
+  modelUsed             String
+  parameters            Json?
+  status                AssetStatus // Statut de la tâche
+  replicatePredictionId String?     @unique // ID Replicate si applicable
+  resultUrl             String? // URL du résultat si succès (image, vidéo, audio)
+  errorMessage          String?     @db.Text // Message si erreur
+  startedAt             DateTime    @default(now())
+  completedAt           DateTime?
+
+  // Relation avec l'utilisateur
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Liens optionnels vers les sources possibles
+  sourceDrawingId String?
+  sourceDrawing   Drawing? @relation(fields: [sourceDrawingId], references: [id], onDelete: SetNull)
+
+  sourceImageId String?
+  sourceImage   GeneratedImage? @relation(fields: [sourceImageId], references: [id], onDelete: SetNull)
+
+  sourceVideoId    String?
+  sourceVideo      GeneratedVideo? @relation(fields: [sourceVideoId], references: [id], onDelete: SetNull)
+  generatedVideoId String?
+  sourceAudioId    String?
+  sourceAudio      GeneratedAudio? @relation(fields: [sourceAudioId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+}
+
+// --- Enums (listes de valeurs possibles pour certains champs) ---
+
+enum DrawingStatus {
+  DRAFT // En cours d'édition par l'utilisateur
+  PROCESSING // Traitement IA en cours (ex: génération image initiale)
+  HAS_IMAGE // Une image IA a été générée à partir du dessin
+  HAS_VIDEO // Une vidéo a été générée
+  ARCHIVED // Archivé (pas supprimé, mais masqué)
+}
+
+enum AssetStatus {
+  PENDING // En attente de traitement
+  PROCESSING // Traitement IA en cours
+  COMPLETED // Traitement terminé avec succès
+  FAILED // Traitement échoué
+}

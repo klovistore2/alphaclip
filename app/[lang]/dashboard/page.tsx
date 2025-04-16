@@ -57,10 +57,10 @@ export default async function Page({
 
       {/* Zone de contenu principal */}
       <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
-        <h1 className="text-2xl font-semibold mb-6">Vidéos Publiques</h1>
+        <h1 className="text-2xl font-semibold mb-6">{dict.sidebar.gallery_video}</h1>
 
         {publicVideos.length === 0 ? (
-          <p className="text-muted-foreground">Aucune vidéo publique à afficher pour le moment.</p>
+          <p className="text-muted-foreground">{dict.gallery.no_videos || dict.gallery.no_generated_images}</p>
         ) : (
           // Grille style YouTube
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8">

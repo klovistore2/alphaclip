@@ -83,6 +83,42 @@
         "general": "The generation failed or did not return an image."
       }
     },
+    "image2video": {
+      "title": "Video Generation",
+      "description": "Turn your images into animated videos.",
+      "source_image": "Source Image",
+      "select_image": "Select an Image",
+      "loading": "Loading image...",
+      "loading_error": "Loading error...",
+      "no_image": "No image selected",
+      "video_description": "Video Description",
+      "prompt_placeholder": "Describe the video you want to generate...",
+      "video_length": "Video Length (s)",
+      "fps": "Frames per Second (FPS)",
+      "fps_value": "FPS",
+      "prompt_optimizer": "Prompt Optimizer (recommended)",
+      "processing_time": "Generation may take several minutes.",
+      "button": "Generate Video",
+      "generating": "Generation in progress...",
+      "mobile_message": "The complete interface is available on desktop",
+      "view_gallery": "View in gallery",
+      "success_message": "Video generation has been successfully started. Processing may take several minutes.",
+      "how_it_works": {
+        "title": "How it works",
+        "step1_title": "1. Select an image",
+        "step1_desc": "Choose a generated image from your gallery as a starting point.",
+        "step2_title": "2. Describe your video",
+        "step2_desc": "Use a descriptive prompt to guide the video generation.",
+        "step3_title": "3. Wait a few minutes",
+        "step3_desc": "Generation is started in the background and can take 3-5 minutes. You will receive a notification."
+      },
+      "errors": {
+        "invalid_source": "Please select a source image first.",
+        "missing_prompt": "Please enter a description for the video.",
+        "loading_failed": "Failed to load the image.",
+        "general": "Video generation failed."
+      }
+    },
     "create_image": {
       "title": "Create Image",
       "description": "Create an image using a text prompt.",
@@ -121,10 +157,13 @@
       "my_drawings": "My Drawings",
       "my_generated_images": "My Generated Images",
       "no_drawings": "You don't have any saved drawings yet.",
-      "no_generated_images": "You haven't generated any images yet.",
+      "no_generated_images": "You haven't generated any content yet.",
+      "no_videos": "No public videos available at the moment.",
       "login_required": "Sign in to view your drawings.",
       "preview_unavailable": "Preview unavailable",
       "image_unavailable": "Image unavailable",
+      "public_videos": "Public Videos",
+      "gallery_video": "Public Videos",
       "thumbnail": {
         "view_full": "View full size",
         "open_in_scribble": "Open in Scribble",

@@ -64,7 +64,6 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
     const dict = dictionary;
 
     // --- Effet Principal (Setup + Keydown Listener) ---
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (canvasRef.current && canvasContainerRef.current) {
             const canvasElement = canvasRef.current;
@@ -144,7 +143,7 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
                 console.log("Fabric canvas disposed on cleanup");
             };
         }
-    }, []); // Le warning est ignoré ici
+    }, [activeTool]); // Ajout de la dépendance manquante
 
 
 

@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
+import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 import { generateImageToVideoAction } from '@/lib/actions/klingAction';
 
@@ -26,8 +27,11 @@ interface FetchedImageData {
 export default function Image2VideoPage() {
     const router = useRouter();
     const routeParams = useParams<{ lang: string; image: string }>();
-    const lang = routeParams.lang;
+    const lang = routeParams.lang as Localy;
     const imageId = routeParams.image;
+    
+    // Dictionnaire pour l'internationalisation
+    const [dict, setDict] = useState<TypeDictionary | null>(null);
 
     // --- États du Composant ---
     const [sourceImage, setSourceImage] = useState<FetchedImageData | null>(null);
@@ -47,6 +51,15 @@ export default function Image2VideoPage() {
     const [generatedVideoId, setGeneratedVideoId] = useState<string | null>(null);
     const [generationSuccess, setGenerationSuccess] = useState<boolean>(false);
     const [generationMessage, setGenerationMessage] = useState<string | null>(null);
+    
+    // --- Chargement du dictionnaire ---
+    useEffect(() => {
+        async function loadDictionary() {
+            const dictionary = await getDictionary(lang);
+            setDict(dictionary);
+        }
+        loadDictionary();
+    }, [lang]);
 
     // --- Fetch des données de l'image source via l'API Route ---
     useEffect(() => {
@@ -73,16 +86,20 @@ export default function Image2VideoPage() {
 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        throw new Error("Image non trouvée ou accès refusé.");
+                        throw new Error(dict?.image2video?.errors?.loading_failed || 
+                            (lang === 'fr' ? "Image non trouvée ou accès refusé." : "Image not found or access denied."));
                     } else {
-                        throw new Error(`Erreur API: ${response.statusText}`);
+                        throw new Error(lang === 'fr' ? 
+                            `Erreur API: ${response.statusText}` : 
+                            `API Error: ${response.statusText}`);
                     }
                 }
 
                 const data: FetchedImageData = await response.json();
 
                 if (!data.imageUrl) {
-                    throw new Error("L'URL de l'image est manquante.");
+                    throw new Error(dict?.image2video?.errors?.invalid_source || 
+                        (lang === 'fr' ? "L'URL de l'image est manquante." : "The image URL is missing."));
                 }
 
                 setSourceImage(data);
@@ -94,14 +111,17 @@ export default function Image2VideoPage() {
 
             } catch (error) {
                 console.error("Failed to fetch image data:", error);
-                setLoadingError(error instanceof Error ? error.message : "Impossible de charger l'image.");
+                setLoadingError(error instanceof Error ? 
+                    error.message : 
+                    dict?.image2video?.errors?.loading_failed || 
+                    (lang === 'fr' ? "Impossible de charger l'image." : "Failed to load the image."));
             } finally {
                 setIsLoadingImage(false);
             }
         }
 
         fetchImageData();
-    }, [imageId]);
+    }, [imageId, dict?.image2video?.errors?.loading_failed, dict?.image2video?.errors?.invalid_source, lang]);
 
     // --- Fonction pour naviguer vers la galerie ---
     const navigateToGallery = () => {
@@ -114,9 +134,11 @@ export default function Image2VideoPage() {
         // 1. Vérification des prérequis
         if (!sourceImage || !sourceImage.imageUrl || !prompt || isGenerating) {
             if (!sourceImage || !sourceImage.imageUrl) {
-                setGenerationError("Veuillez d'abord sélectionner une image source.");
+                setGenerationError(dict?.image2video?.errors?.invalid_source || 
+                    (lang === 'fr' ? "Veuillez d'abord sélectionner une image source." : "Please select a source image first."));
             } else if (!prompt) {
-                setGenerationError("Veuillez entrer une description pour la vidéo.");
+                setGenerationError(dict?.image2video?.errors?.missing_prompt || 
+                    (lang === 'fr' ? "Veuillez entrer une description pour la vidéo." : "Please enter a description for the video."));
             }
             
             if (!sourceImage || !sourceImage.imageUrl || !prompt) return;
@@ -154,18 +176,25 @@ export default function Image2VideoPage() {
             // 4. Traiter le résultat
             if (result.success) {
                 setGenerationSuccess(true);
-                setGenerationMessage(result.message || "La génération de vidéo a été lancée avec succès. Le traitement peut prendre plusieurs minutes.");
+                setGenerationMessage(result.message || dict?.image2video?.success_message || 
+                    (lang === 'fr' 
+                        ? "La génération de vidéo a été lancée avec succès. Le traitement peut prendre plusieurs minutes." 
+                        : "Video generation has been successfully started. Processing may take several minutes."));
                 
                 if (result.generatedVideoId) {
                     setGeneratedVideoId(result.generatedVideoId);
                 }
             } else {
-                throw new Error(result.error || "La génération de vidéo a échoué.");
+                throw new Error(result.error || dict?.image2video?.errors?.general || 
+                    (lang === 'fr' ? "La génération de vidéo a échoué." : "Video generation failed."));
             }
 
         } catch (error) {
             console.error("Video generation failed:", error);
-            setGenerationError(error instanceof Error ? error.message : "Échec de la génération de vidéo.");
+            setGenerationError(error instanceof Error ? 
+                error.message : 
+                dict?.image2video?.errors?.general || 
+                (lang === 'fr' ? "Échec de la génération de vidéo." : "Video generation failed."));
             setGenerationSuccess(false);
         } finally {
             setIsGenerating(false);
@@ -179,9 +208,16 @@ export default function Image2VideoPage() {
         }
     };
 
+    // Attendons que le dictionnaire soit chargé
+    if (!dict) {
+        return <div className="container py-10 flex justify-center items-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
+    
     // --- Affichage conditionnel pendant le chargement initial ---
     if (isLoadingImage && imageId !== "0") {
-        return <div className="container py-10 flex justify-center items-center"><Loader2 className="h-8 w-8 animate-spin" /> Chargement de l image...</div>;
+        return <div className="container py-10 flex justify-center items-center">
+            <Loader2 className="h-8 w-8 animate-spin" /> {dict.image2video.loading}
+        </div>;
     }
     
     if (loadingError && !isSelectingSource) {
@@ -189,19 +225,19 @@ export default function Image2VideoPage() {
     }
 
     // Utiliser un titre par défaut ou celui de l'image chargée
-    const displayTitle = sourceImage?.title || "Nouvelle Vidéo";
+    const displayTitle = sourceImage?.title || dict.image2video.title;
 
     return (
         <>
             <div className="md:hidden">
-                <p className="text-center p-6">L interface complète est disponible sur desktop</p>
+                <p className="text-center p-6">{dict.image2video.mobile_message}</p>
             </div>
             <div className="hidden h-full flex-col md:flex">
                 {/* Header */}
                 <div className="container flex items-center justify-between md:h-16">
                     <h2 className="text-lg font-semibold flex items-center">
                         <FilmIcon className="mr-2 h-5 w-5" />
-                        Génération Vidéo - {displayTitle}
+                        {dict.image2video.title} - {displayTitle}
                     </h2>
                 </div>
                 <Separator />
@@ -215,12 +251,12 @@ export default function Image2VideoPage() {
                             {/* Carte Image Source */}
                             <Card className="col-span-1">
                                 <CardContent className="p-4 space-y-2">
-                                    <h3 className="text-lg font-medium">Image Source</h3>
+                                    <h3 className="text-lg font-medium">{dict.image2video.source_image}</h3>
                                     <div className="aspect-video bg-muted rounded-md overflow-hidden relative border flex items-center justify-center">
                                         {isSelectingSource ? (
                                             <Button variant="outline" onClick={navigateToGallery}>
                                                 <ImagePlus className="mr-2 h-4 w-4" />
-                                                Sélectionner une Image
+                                                {dict.image2video.select_image}
                                             </Button>
                                         ) : sourceImage?.imageUrl ? (
                                             <Image 
@@ -232,7 +268,7 @@ export default function Image2VideoPage() {
                                                 sizes="(max-width: 1024px) 100vw, 33vw" 
                                             />
                                         ) : (
-                                            <p className="text-sm text-muted-foreground p-4">Aucune image sélectionnée</p>
+                                            <p className="text-sm text-muted-foreground p-4">{dict.image2video.no_image}</p>
                                         )}
                                     </div>
                                 </CardContent>
@@ -242,13 +278,13 @@ export default function Image2VideoPage() {
                             <Card className="col-span-1 lg:col-span-2">
                                 <CardContent className="p-4 space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="prompt-input">Description de la vidéo</Label>
+                                        <Label htmlFor="prompt-input">{dict.image2video.video_description}</Label>
                                         <Textarea 
                                             id="prompt-input" 
                                             value={prompt} 
                                             onChange={(e) => setPrompt(e.target.value)} 
                                             disabled={isGenerating || isSelectingSource}
-                                            placeholder="Décrivez la vidéo que vous souhaitez générer..." 
+                                            placeholder={dict.image2video.prompt_placeholder} 
                                             className="min-h-[80px]"
                                         />
                                     </div>
@@ -256,7 +292,7 @@ export default function Image2VideoPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <Label htmlFor="video-length">Durée de la vidéo (s)</Label>
+                                                <Label htmlFor="video-length">{dict.image2video.video_length}</Label>
                                                 <span className="text-sm text-muted-foreground">{videoLength}s</span>
                                             </div>
                                             <Slider 
@@ -272,8 +308,8 @@ export default function Image2VideoPage() {
                                         
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <Label htmlFor="fps">Images par seconde (FPS)</Label>
-                                                <span className="text-sm text-muted-foreground">{fps} FPS</span>
+                                                <Label htmlFor="fps">{dict.image2video.fps}</Label>
+                                                <span className="text-sm text-muted-foreground">{fps} {dict.image2video.fps_value}</span>
                                             </div>
                                             <Slider 
                                                 id="fps"
@@ -294,12 +330,12 @@ export default function Image2VideoPage() {
                                             onCheckedChange={setPromptOptimizer}
                                             disabled={isGenerating}
                                         />
-                                        <Label htmlFor="optimizer">Optimiseur de prompt (recommandé)</Label>
+                                        <Label htmlFor="optimizer">{dict.image2video.prompt_optimizer}</Label>
                                     </div>
                                     
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                         <div className="text-sm text-muted-foreground">
-                                            La génération peut prendre plusieurs minutes.
+                                            {dict.image2video.processing_time}
                                         </div>
                                         <Button 
                                             type="button" 
@@ -310,9 +346,14 @@ export default function Image2VideoPage() {
                                             {isGenerating ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                                                    Génération en cours...
+                                                    {dict.image2video.generating}
                                                 </>
-                                            ) : "Générer la Vidéo"}
+                                            ) : (
+                                                <>
+                                                    <FilmIcon className="mr-2 h-4 w-4" />
+                                                    {dict.image2video.button}
+                                                </>
+                                            )}
                                         </Button>
                                     </div>
                                     
@@ -330,7 +371,7 @@ export default function Image2VideoPage() {
                                                     className="mt-2"
                                                     onClick={viewGeneratedVideo}
                                                 >
-                                                    Voir dans la galerie
+                                                    {dict.image2video.view_gallery}
                                                 </Button>
                                             )}
                                         </div>
@@ -342,30 +383,30 @@ export default function Image2VideoPage() {
                         {/* Section Prévisualisation */}
                         <Card>
                             <CardContent className="p-6">
-                                <h3 className="text-lg font-medium mb-4">Comment ça fonctionne</h3>
+                                <h3 className="text-lg font-medium mb-4">{dict.image2video.how_it_works.title}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
                                         <div className="bg-primary/10 p-3 rounded-full mb-3">
                                             <ImagePlus className="h-6 w-6 text-primary" />
                                         </div>
-                                        <h4 className="font-medium mb-2">1. Sélectionnez une image</h4>
-                                        <p className="text-sm text-muted-foreground">Choisissez une image générée depuis votre galerie comme point de départ.</p>
+                                        <h4 className="font-medium mb-2">{dict.image2video.how_it_works.step1_title}</h4>
+                                        <p className="text-sm text-muted-foreground">{dict.image2video.how_it_works.step1_desc}</p>
                                     </div>
                                     
                                     <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
                                         <div className="bg-primary/10 p-3 rounded-full mb-3">
                                             <FilmIcon className="h-6 w-6 text-primary" />
                                         </div>
-                                        <h4 className="font-medium mb-2">2. Décrivez votre vidéo</h4>
-                                        <p className="text-sm text-muted-foreground">Utilisez un prompt descriptif pour guider la génération de la vidéo.</p>
+                                        <h4 className="font-medium mb-2">{dict.image2video.how_it_works.step2_title}</h4>
+                                        <p className="text-sm text-muted-foreground">{dict.image2video.how_it_works.step2_desc}</p>
                                     </div>
                                     
                                     <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
                                         <div className="bg-primary/10 p-3 rounded-full mb-3">
                                             <Loader2 className="h-6 w-6 text-primary" />
                                         </div>
-                                        <h4 className="font-medium mb-2">3. Patientez quelques minutes</h4>
-                                        <p className="text-sm text-muted-foreground">La génération est lancée en arrière-plan et peut prendre 3-5 minutes. Vous recevrez une notification.</p>
+                                        <h4 className="font-medium mb-2">{dict.image2video.how_it_works.step3_title}</h4>
+                                        <p className="text-sm text-muted-foreground">{dict.image2video.how_it_works.step3_desc}</p>
                                     </div>
                                 </div>
                             </CardContent>

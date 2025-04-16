@@ -83,6 +83,42 @@
       "general": "La génération a échoué ou n'a pas retourné d'image."
     }
   },
+  "image2video": {
+    "title": "Génération Vidéo",
+    "description": "Transformez vos images en vidéos animées.",
+    "source_image": "Image Source",
+    "select_image": "Sélectionner une Image",
+    "loading": "Chargement de l'image...",
+    "loading_error": "Erreur de chargement...",
+    "no_image": "Aucune image sélectionnée",
+    "video_description": "Description de la vidéo",
+    "prompt_placeholder": "Décrivez la vidéo que vous souhaitez générer...",
+    "video_length": "Durée de la vidéo (s)",
+    "fps": "Images par seconde (FPS)",
+    "fps_value": "FPS",
+    "prompt_optimizer": "Optimiseur de prompt (recommandé)",
+    "processing_time": "La génération peut prendre plusieurs minutes.",
+    "button": "Générer la Vidéo",
+    "generating": "Génération en cours...",
+    "mobile_message": "L'interface complète est disponible sur desktop",
+    "view_gallery": "Voir dans la galerie",
+    "success_message": "La génération de vidéo a été lancée avec succès. Le traitement peut prendre plusieurs minutes.",
+    "how_it_works": {
+      "title": "Comment ça fonctionne",
+      "step1_title": "1. Sélectionnez une image",
+      "step1_desc": "Choisissez une image générée depuis votre galerie comme point de départ.",
+      "step2_title": "2. Décrivez votre vidéo",
+      "step2_desc": "Utilisez un prompt descriptif pour guider la génération de la vidéo.",
+      "step3_title": "3. Patientez quelques minutes",
+      "step3_desc": "La génération est lancée en arrière-plan et peut prendre 3-5 minutes. Vous recevrez une notification."
+    },
+    "errors": {
+      "invalid_source": "Veuillez d'abord sélectionner une image source.",
+      "missing_prompt": "Veuillez entrer une description pour la vidéo.",
+      "loading_failed": "Impossible de charger l'image.",
+      "general": "La génération de vidéo a échoué."
+    }
+  },
   "create_image": {
     "title": "Créer une image",
     "description": "Créez une image à partir d'une description textuelle.",
@@ -121,10 +157,13 @@
     "my_drawings": "Mes Dessins",
     "my_generated_images": "Mes Images Générées",
     "no_drawings": "Vous n'avez pas encore de dessins enregistrés.",
-    "no_generated_images": "Vous n'avez pas encore généré d'images.",
+    "no_generated_images": "Vous n'avez pas encore généré de contenu.",
+    "no_videos": "Aucune vidéo publique n'est disponible pour le moment.",
     "login_required": "Connectez-vous pour voir vos dessins.",
     "preview_unavailable": "Aperçu indisponible",
     "image_unavailable": "Image indisponible",
+    "public_videos": "Vidéos Publiques",
+    "gallery_video": "Vidéos Publiques",
     "thumbnail": {
       "view_full": "Voir en grand",
       "open_in_scribble": "Ouvrir dans Scribble",

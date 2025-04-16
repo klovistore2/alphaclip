@@ -2,7 +2,6 @@ import { getDictionary, Localy } from './dictionaries'
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
-//import Image from 'next/image'
 
 export default async function Page({
   params,
@@ -11,6 +10,24 @@ export default async function Page({
 }) {
   const { lang } = await params
   const dict = await getDictionary(lang)
+
+  const featuresData = [
+    { 
+      icon: '🎨', 
+      title: dict.sidebar.createImage, 
+      description: dict.create_image.description 
+    },
+    { 
+      icon: '🔄', 
+      title: dict.sidebar.imageToImage, 
+      description: dict.sidebar.imageToImage_variation 
+    },
+    { 
+      icon: '🎬', 
+      title: dict.sidebar.generateVideo, 
+      description: dict.image2video.description 
+    }
+  ]
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -44,11 +61,7 @@ export default async function Page({
         </div>
 
         <div className="mt-24 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {[
-            { icon: '🎨', title: dict.sidebar.createImage, description: dict.create_image.description },
-            { icon: '🔄', title: dict.sidebar.imageToImage, description: dict.metadata.description.split('.')[0] },
-            { icon: '🎬', title: dict.sidebar.generateVideo, description: dict.metadata.description.split('.')[1] }
-          ].map((feature, i) => (
+          {featuresData.map((feature, i) => (
             <div key={i} className="rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md">
               <div className="text-4xl mb-4">{feature.icon}</div>
               <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
@@ -60,7 +73,7 @@ export default async function Page({
 
       <footer className="py-6 border-t">
         <div className="container flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© 2025 {dict.metadata.title}. {dict.userNav.settings}</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} {dict.metadata.title}. {dict.userNav.settings}</p>
           <nav className="flex gap-6">
             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
               {dict.userNav.profile}

@@ -37,8 +37,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ data, lang, ...props }: AppSidebarProps) {
   // Utiliser les traductions de la sidebar
 
-  
-  console.log("AppSidebar lang", lang); 
+
   const navMainItems = [
     {
       title: data.sidebar.gallery,

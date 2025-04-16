@@ -113,7 +113,7 @@ export default function ImageVariationPage() {
         }
 
         fetchImageData();
-    }, [imageId]);
+    }, [imageId, dict?.variation?.errors?.loading_failed, dict?.variation?.errors?.invalid_source, lang]);
 
     // --- Fonction pour naviguer vers la galerie ---
     const navigateToGallery = () => {

@@ -101,6 +101,42 @@ export interface TypeDictionary {
       general: string;
     }
   };
+  image2video: {
+    title: string;
+    description: string;
+    source_image: string;
+    select_image: string;
+    loading: string;
+    loading_error: string;
+    no_image: string;
+    video_description: string;
+    prompt_placeholder: string;
+    video_length: string;
+    fps: string;
+    fps_value: string;
+    prompt_optimizer: string;
+    processing_time: string;
+    button: string;
+    generating: string;
+    mobile_message: string;
+    view_gallery: string;
+    success_message: string;
+    how_it_works: {
+      title: string;
+      step1_title: string;
+      step1_desc: string;
+      step2_title: string;
+      step2_desc: string;
+      step3_title: string;
+      step3_desc: string;
+    };
+    errors: {
+      invalid_source: string;
+      missing_prompt: string;
+      loading_failed: string;
+      general: string;
+    }
+  };
   create_image: {
     title: string;
     description: string;
@@ -134,9 +170,12 @@ export interface TypeDictionary {
     my_generated_images: string;
     no_drawings: string;
     no_generated_images: string;
+    no_videos?: string;
     login_required: string;
     preview_unavailable: string;
     image_unavailable: string;
+    public_videos?: string;
+    gallery_video?: string;
     thumbnail: {
       view_full: string;
       open_in_scribble: string;
