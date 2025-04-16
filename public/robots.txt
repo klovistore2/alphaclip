@@ -1,0 +1,17 @@
+# Allow all web crawlers (search engine bots)
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Disallow crawling of specific paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/create/
+Disallow: /dashboard/image2image/
+Disallow: /dashboard/videogenerate/
+Disallow: /dashboard/improvevideo/
+
+# Allow crawling of gallery and public content
+Allow: /dashboard/gallery/
