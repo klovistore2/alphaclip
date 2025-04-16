@@ -67,7 +67,7 @@ export interface TypeDictionary {
       untitled: string;
     }
   };
-  nav?: {
+  nav: {
     playground: string;
     playgroundAI: string;
     paintStudio: string;

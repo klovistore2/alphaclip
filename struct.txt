@@ -51,3 +51,4 @@ aitubbb.com
 - text2image au moins 2 model
 - save as generated pour le canva
 - resend
+-arrenger la sidebar (HOme en haut) historique en bas avec le style different (projet)

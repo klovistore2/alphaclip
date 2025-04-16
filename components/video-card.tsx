@@ -1,13 +1,12 @@
-// components/video-card.tsx ou un chemin similaire
-"use client"; // Important pour l'interactivité
+// components/video-card.tsx
+"use client";
 
 import { CldVideoPlayer } from 'next-cloudinary';
-import 'next-cloudinary/dist/cld-video-player.css'; // Styles du player
+import 'next-cloudinary/dist/cld-video-player.css';
 import {
   Card,
   CardContent,
   CardDescription,
-
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,39 +17,67 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Download, Music } from "lucide-react"; // Icônes
-import { useRouter } from "next/navigation"
-// Définir le type pour les props du composant
+import { MoreVertical, Download, Music } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+interface Dictionary {
+  gallery?: {
+    thumbnail?: {
+      download?: string;
+      options?: string;
+      untitled?: string;
+    };
+    image_unavailable?: string;
+  };
+  sidebar?: {
+    improveVideo_addSound?: string;
+  };
+}
+
 interface VideoCardProps {
   video: {
     id: string;
-    cloudinaryPublicId: string | null; // Peut être null, mais on filtre en amont
+    cloudinaryPublicId: string | null;
     title?: string | null;
     prompt?: string | null;
     videoUrl: string | null;
   };
+  dictionary?: Dictionary;
+  lang?: string;
 }
 
-export function VideoCard({ video }: VideoCardProps) {
-  const router = useRouter()
+export function VideoCard({ video, dictionary, lang }: VideoCardProps) {
+  const router = useRouter();
+  
+  // Fallback textes si le dictionnaire n'est pas fourni
+  const texts = {
+    download: dictionary?.gallery?.thumbnail?.download || "Télécharger",
+    addSound: dictionary?.sidebar?.improveVideo_addSound || "Ajouter du son",
+    openMenu: dictionary?.gallery?.thumbnail?.options || "Ouvrir le menu",
+    untitled: dictionary?.gallery?.thumbnail?.untitled || "Vidéo sans titre",
+    cloudinaryError: dictionary?.gallery?.image_unavailable || "Erreur: ID Cloudinary manquant."
+  };
+
   // Vérification au cas où, même si on filtre en amont
   if (!video.cloudinaryPublicId) {
     return (
-      <Card className="flex items-center justify-center h-[250px]"> {/* Ajustez la hauteur */}
-        <p className="text-destructive">Erreur: ID Cloudinary manquant.</p>
+      <Card className="flex items-center justify-center h-[250px]">
+        <p className="text-destructive">{texts.cloudinaryError}</p>
       </Card>
     );
   }
 
   const handleDownload = () => {
     if (!video.videoUrl) {
-        alert("Impossible de télécharger : URL de la vidéo manquante.");
-        return;
+      const errorMsg = lang === 'fr' 
+        ? "Impossible de télécharger : URL de la vidéo manquante."
+        : "Unable to download: Missing video URL.";
+      alert(errorMsg);
+      return;
     }
-    // Créer un lien temporaire et cliquer dessus pour forcer le téléchargement
+    
     const link = document.createElement('a');
     link.href = video.videoUrl;
-    // Essayer de donner un nom au fichier (peut ne pas marcher partout)
     link.download = `${video.title || video.id || 'video'}.mp4`;
     document.body.appendChild(link);
     link.click();
@@ -58,71 +85,55 @@ export function VideoCard({ video }: VideoCardProps) {
   };
 
   const handleAddSound = () => {
-
-    router.push(`/dashboard/improvevideo/addsound/${video.id}`)
-
+    const basePath = lang ? `/${lang}` : '';
+    router.push(`${basePath}/dashboard/improvevideo/addsound/${video.id}`);
   };
 
   return (
-   <Card className="overflow-hidden flex flex-col h-full bg-black text-gray-100 border border-gray-800 rounded-lg">
-
-      {/* === Modifications ici === */}
-      {/* Ajout de padding (p-2) autour du lecteur vidéo */}
-      <CardContent className="p-2 aspect-video"> {/* p-2 crée la marge autour du lecteur */}
+    <Card className="overflow-hidden flex flex-col h-full bg-black text-gray-100 border border-gray-800 rounded-lg">
+      <CardContent className="p-2 aspect-video">
         <CldVideoPlayer
           id={`${video.id}`}
           width="1920"
           height="1080"
           src={video.cloudinaryPublicId}
           autoplay={false}
-          // Mettre controls={false} si on veut une apparence pure "vignette"
-          // et peut-être ajouter un bouton play en superposition
           controls={true}
-          className="w-full h-full object-cover rounded-sm" // Léger arrondi pour le lecteur lui-même
+          className="w-full h-full object-cover rounded-sm"
         />
       </CardContent>
 
-      {/* === Modifications ici === */}
-      {/* py-2: Padding vertical réduit */}
-      {/* px-3: Padding horizontal (peut être px-2 si p-2 dans CardContent) */}
       <CardFooter className="flex flex-row items-center justify-between py-2 px-3 mt-auto">
-
-        {/* === Modifications ici === */}
-        {/* space-y-0: Espace vertical minimal entre titre et description */}
         <div className="flex-1 space-y-0 mr-2 overflow-hidden">
-           {/* Texte plus clair si besoin (hérite de text-gray-100 normalement) */}
-          <CardTitle className="text-sm font-medium truncate block text-white"> {/* Forcer blanc pour titre ? */}
-            {video.title || video.prompt || "Vidéo sans titre"}
+          <CardTitle className="text-sm font-medium truncate block text-white">
+            {video.title || video.prompt || texts.untitled}
           </CardTitle>
           {(video.prompt && video.title && video.prompt !== video.title || video.prompt && !video.title) && (
-             <CardDescription className="text-xs truncate block text-gray-400"> {/* Gris plus clair pour description */}
-               {video.prompt}
-             </CardDescription>
+            <CardDescription className="text-xs truncate block text-gray-400">
+              {video.prompt}
+            </CardDescription>
           )}
         </div>
 
-        {/* Le bouton devrait hériter de text-gray-100 via Card, sinon ajouter text-gray-100 ici */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-             {/* Le bouton fantôme sur fond sombre devrait avoir une icone claire */}
             <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0 text-gray-300 hover:text-white">
-              <span className="sr-only">Ouvrir le menu</span>
+              <span className="sr-only">{texts.openMenu}</span>
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end"> {/* Le menu lui-même aura le style par défaut du thème */}
+          <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={handleDownload} disabled={!video.videoUrl}>
               <Download className="mr-2 h-4 w-4" />
-              <span>Télécharger</span>
+              <span>{texts.download}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleAddSound}>
               <Music className="mr-2 h-4 w-4" />
-              <span>Ajouter du son</span>
+              <span>{texts.addSound}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardFooter>
-
     </Card>
   );
 }

@@ -1,83 +1,122 @@
-// app/gallery/page.tsx
-
-import { auth } from "@/lib/auth"; // Adaptez le chemin vers vos options NextAuth
-import { prisma } from "@/lib/prisma";   // Adaptez le chemin vers votre client Prisma
-import { redirect } from "next/navigation";
-import { VideoCard } from "@/components/video-card"; // Nous créerons ce composant ensuite
+// app/[lang]/dashboard/gallery/videos/page.tsx
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { VideoCard } from "@/components/video-card";
 import { Terminal } from "lucide-react";
-type Language = 'en' | 'fr';
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { Localy, getDictionary } from "@/app/[lang]/dictionaries";
 
-export default async function GalleryPage({ // Renommé de HistoryPage à GalleryPage pour plus de clarté
-
+export default async function GalleryVideoPage({
   params,
-  
-  }: {
-  
-  params: Promise<{ lang: Language }>
-  
-  }) {
-  
-  
-  
+}: {
+  params: Promise<{ lang: Localy }>
+}) {
   const { lang } = await params;
-
-  console.log("Langue sélectionnée :", lang); // Pour le débogage
-
+  const dict = await getDictionary(lang);
+  
   // 1. Récupérer la session utilisateur côté serveur
   const session = await auth();
-
-
   
   // 2. Vérifier si l'utilisateur est connecté
   if (!session?.user?.id) {
     // Rediriger vers la page de connexion si non connecté
-    redirect("/api/auth/signin?callbackUrl=/gallery"); // Ou une autre page si vous préférez
+    redirect(`/api/auth/signin?callbackUrl=/${lang}/dashboard/gallery/videos`);
   }
 
   // 3. Récupérer les vidéos de l'utilisateur depuis la base de données
   const userVideos = await prisma.generatedVideo.findMany({
     where: {
-      userId: session.user.id, // Filtrer par l'ID de l'utilisateur connecté
-      isDeleted: false,        // Ne pas afficher les vidéos marquées comme supprimées
-      status: 'COMPLETED',     // Afficher uniquement les vidéos terminées
-      cloudinaryPublicId: {    // S'assurer que le publicId existe pour l'affichage
+      userId: session.user.id,
+      isDeleted: false,
+      status: 'COMPLETED',
+      cloudinaryPublicId: {
         not: null
       }
     },
     orderBy: {
-      createdAt: 'desc', // Trier par date de création (les plus récentes d'abord)
+      createdAt: 'desc',
     },
-    select: { // Sélectionner uniquement les champs nécessaires
+    select: {
       id: true,
       cloudinaryPublicId: true,
       title: true,
       prompt: true,
-      videoUrl: true, // Important pour le téléchargement
-      // Ajoutez d'autres champs si nécessaire pour l'affichage
+      videoUrl: true,
     }
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Ma Galerie Vidéo</h1>
-
-      {userVideos.length === 0 ? (
-        <Alert>
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Aucune vidéo trouvée !</AlertTitle>
-          <AlertDescription>
-            Vous n avez pas encore généré de vidéos, ou elles sont encore en cours de traitement.
-          </AlertDescription>
-        </Alert>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {userVideos.map((video) => (
-            // Passer les données nécessaires au composant VideoCard
-            <VideoCard key={video.id} video={video} />
-          ))}
+    <SidebarInset>
+      {/* Header */}
+      <header className="flex h-16 shrink-0 items-center justify-between">
+        <div className="flex items-center gap-2 px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbLink href={`/${lang}/dashboard/gallery/image`}>{dict.gallery.title}</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{dict.sidebar.gallery_video}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
-      )}
-    </div>
+      </header>
+
+      {/* Contenu Principal */}
+      <div className="flex flex-1 flex-col p-6">
+        <div className="mx-auto w-full max-w-6xl space-y-6">
+          {/* Titre */}
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{dict.sidebar.gallery_video}</h1>
+            <p className="text-muted-foreground">{dict.gallery.subtitle}</p>
+          </div>
+
+          {/* Contenu des vidéos */}
+          {userVideos.length === 0 ? (
+            <Alert>
+              <Terminal className="h-4 w-4" />
+              <AlertTitle>
+                {dict.gallery.no_generated_images}
+              </AlertTitle>
+              <AlertDescription>
+                {lang === 'fr' 
+                  ? 'Vous n\'avez pas encore généré de vidéos, ou elles sont encore en cours de traitement.'
+                  : 'You haven\'t generated any videos yet, or they are still being processed.'}
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userVideos.map((video) => (
+                <VideoCard 
+                  key={video.id} 
+                  video={video} 
+                  dictionary={dict} 
+                  lang={lang}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </SidebarInset>
   );
 }
