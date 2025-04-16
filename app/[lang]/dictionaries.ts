@@ -9,6 +9,15 @@ const dictionaries = {
   fr: () => import('@/dictionaries/fr.json').then((module) => module.default),
 }
  
+export const languageNames: Record<Localy, string> = {
+  en: "English",
+  fr: "Français",
+
+}
+
+export const locales_ = ["en", "fr"] as const
+
+
 export const getDictionary = async (locale: Localy): Promise<TypeDictionary> =>
   dictionaries[locale]();
 

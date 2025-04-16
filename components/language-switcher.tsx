@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import { locales_, languageNames } from "@/lib/lang"  
+import { locales_, languageNames } from "@/app/[lang]/dictionaries"  
 
 export function LanguageSwitcher({ currentLang }: { currentLang: string }) {
   const pathname = usePathname()
