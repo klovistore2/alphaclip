@@ -29,6 +29,29 @@ export interface TypeDictionary {
     title: string;
     description: string;
   };
+  home?: {
+    siteTitle: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    featuresTitle: string;
+    featuresItems: Array<{
+      title: string;
+      desc: string;
+    }>;
+    whyUsTitle: string;
+    whyUsText: string;
+    ctaTitle: string;
+    ctaText: string;
+    exploreGalleryText: string;
+    createNowText: string;
+    flowSteps: {
+      drawing: string;
+      image: string;
+      video: string;
+      sound: string;
+      viral: string;
+    };
+  };
   extend_video: {
     title: string;
     description: string;

@@ -108,10 +108,6 @@ export function AppSidebar({ data,lang, ...props }: AppSidebarProps) {
           title: data.sidebar.improveVideo_addSound,
           url: "/dashboard/improvevideo/addsound/0",
         },
-        {
-          title: data.sidebar.improveVideo_makeLonger,
-          url: "/dashboard/improvevideo/extendvideo/0",
-        },
       ],
     },
   ];

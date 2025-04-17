@@ -7,6 +7,40 @@
       "cart": "Add to Cart",
       "text": "Texte"
     },
+    
+    "home": {
+      "siteTitle": "yatubbb",
+      "heroTitle": "Stop scrolling, start creating!",
+      "heroSubtitle": "The days of mindlessly binge-watching YouTube are DEAD. With yatubbb, you take control: turn your drawings into badass videos, add sound, and unleash your creations on the world. No passive viewers here—just fearless creators.",
+      "featuresTitle": "What's the vibe?",
+      "featuresItems": [
+        {
+          "title": "From sketch to video in a snap",
+          "desc": "Your doodles morph into animated clips, with or without sound, ready to go viral."
+        },
+        {
+          "title": "Total freedom",
+          "desc": "Make your own videos, remix others', or build on stories that spark your imagination."
+        },
+        {
+          "title": "Share without limits",
+          "desc": "Publish your work publicly and show the world what you're made of."
+        }
+      ],
+      "whyUsTitle": "Why yatubbb?",
+      "whyUsText": "Because we're sick of platforms where you just consume and contribute nothing. Our tool is simple, intuitive, and built for free spirits who want to leave a mark. Drawing → Image → Video → Sound → Boom, you're viral.",
+      "ctaTitle": "So, what are you waiting for?",
+      "ctaText": "Grab a pencil, an idea, and come shake up the game. yatubbb isn't just a platform—it's a revolution. Create. Share. Dominate.",
+      "exploreGalleryText": "Explore gallery",
+      "createNowText": "Create now",
+      "flowSteps": {
+        "drawing": "Drawing",
+        "image": "Image",
+        "video": "Video",
+        "sound": "Sound",
+        "viral": "Viral!"
+      }
+    },
     "add_sound": {
       "title": "Add Sound",
       "description": "Add sound to your video.",

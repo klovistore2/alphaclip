@@ -7,6 +7,40 @@
     "cart": "Ajouter au panier",
     "text": "Texte"
   },
+  
+  "home": {
+    "siteTitle": "yatubbb",
+    "heroTitle": "Fini le défilement passif, place à la création !",
+    "heroSubtitle": "L'époque du visionnage passif de YouTube est RÉVOLUE. Avec yatubbb, prenez le contrôle : transformez vos dessins en vidéos impressionnantes, ajoutez du son et partagez vos créations. Ici, pas de spectateurs passifs—seulement des créateurs audacieux.",
+    "featuresTitle": "Quelle est l'ambiance ?",
+    "featuresItems": [
+      {
+        "title": "Du croquis à la vidéo en un clin d'œil",
+        "desc": "Vos dessins se transforment en clips animés, avec ou sans son, prêts à devenir viraux."
+      },
+      {
+        "title": "Liberté totale",
+        "desc": "Créez vos propres vidéos, remixez celles des autres, ou construisez à partir d'histoires qui stimulent votre imagination."
+      },
+      {
+        "title": "Partagez sans limites",
+        "desc": "Publiez votre travail publiquement et montrez au monde de quoi vous êtes capable."
+      }
+    ],
+    "whyUsTitle": "Pourquoi yatubbb ?",
+    "whyUsText": "Parce que nous en avons assez des plateformes où vous ne faites que consommer sans rien apporter. Notre outil est simple, intuitif et conçu pour les esprits libres qui veulent laisser leur marque. Dessin → Image → Vidéo → Son → Boum, vous êtes viral.",
+    "ctaTitle": "Alors, qu'attendez-vous ?",
+    "ctaText": "Prenez un crayon, une idée, et venez bouleverser les règles du jeu. yatubbb n'est pas juste une plateforme—c'est une révolution. Créez. Partagez. Dominez.",
+    "exploreGalleryText": "Explorer la galerie",
+    "createNowText": "Créer maintenant",
+    "flowSteps": {
+      "drawing": "Dessin",
+      "image": "Image",
+      "video": "Vidéo",
+      "sound": "Son",
+      "viral": "Viral!"
+    }
+  },
   "add_sound": {
     "title": "Ajouter du Son",
     "description": "Ajoutez du son à votre vidéo.",
