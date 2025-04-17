@@ -152,7 +152,9 @@
     "saving": "Sauvegarde...",
     "save_in_progress": "Sauvegarde en cours...",
     "save_error": "Erreur : ",
-    "save_success": "Dessin sauvegardé ! Redirection..."
+    "save_success": "Dessin sauvegardé ! Redirection...",
+    "save_as_drawing": "Enregistrer comme dessin",
+    "save_as_generated": "Enregistrer comme image générée"
   },
   "nav": {
     "playground": "Terrain de jeu",

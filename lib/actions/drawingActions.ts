@@ -49,45 +49,62 @@ cloudinary.config({
   // --- Nouvelle Server Action pour Sauvegarder le Dessin ---
   export async function saveDrawingAction(
       imageDataFile: File,
-      canvasStateJson?: string // Le JSON de l'état du canevas est optionnel
+      canvasStateJson?: string, // Le JSON de l'état du canevas est optionnel
+      isGeneratedImage: boolean = false // Nouveau paramètre pour indiquer si c'est une image générée
   ): Promise<{ success: boolean; drawingId?: string; error?: string }> // Type de retour
   {
-      console.log("Server Action: saveDrawingAction invoked");
-  
+      console.log("Server Action: saveDrawingAction invoked", isGeneratedImage ? "as generated image" : "as drawing");
+
       const session = await auth();
       const userId = session?.user?.id;
-  
+
       if (!userId) {
           console.error("Server Action Error: User not authenticated");
           return { success: false, error: "Utilisateur non authentifié." };
       }
-       console.log("Server Action: User authenticated:", userId);
-  
+      console.log("Server Action: User authenticated:", userId);
+
       try {
           console.log("Server Action: Uploading to Cloudinary...");
           const cloudinaryResult = await uploadImageToCloudinary(imageDataFile);
-  
+
           if (!cloudinaryResult?.secure_url) {
-               console.error("Server Action Error: Cloudinary upload failed or missing URL", cloudinaryResult);
-               throw new Error("L'upload de l'image vers Cloudinary a échoué.");
+              console.error("Server Action Error: Cloudinary upload failed or missing URL", cloudinaryResult);
+              throw new Error("L'upload de l'image vers Cloudinary a échoué.");
           }
-           console.log("Server Action: Cloudinary upload successful:", cloudinaryResult.secure_url);
-  
-          console.log("Server Action: Saving to database...");
-          const newDrawing = await prisma.drawing.create({
-              data: {
-                  userId: userId,
-                  title: `Dessin ${new Date().toLocaleTimeString()}`, // Titre par défaut
-                  previewUrl: cloudinaryResult.secure_url,
-                  // Correction 4: Utiliser Prisma.JsonNull
-                  content: canvasStateJson ? JSON.parse(canvasStateJson) : Prisma.JsonNull,
-                  status: 'DRAFT',
-              }
-          });
-          console.log("Server Action: Database save successful, Drawing ID:", newDrawing.id);
-  
-          return { success: true, drawingId: newDrawing.id };
-  
+          console.log("Server Action: Cloudinary upload successful:", cloudinaryResult.secure_url);
+
+          if (isGeneratedImage) {
+              // Sauvegarder comme une image générée
+              console.log("Server Action: Saving as generated image to database...");
+              const newImage = await prisma.generatedImage.create({
+                  data: {
+                      userId: userId,
+                      title: `Image générée ${new Date().toLocaleTimeString()}`,
+                      imageUrl: cloudinaryResult.secure_url,
+                      prompt: "Created from canvas", // Prompt par défaut pour les images dessinées
+                      status: 'COMPLETED',
+                  }
+              });
+              console.log("Server Action: Database save successful, Image ID:", newImage.id);
+              return { success: true, drawingId: newImage.id };
+          } else {
+              // Sauvegarder comme un dessin
+              console.log("Server Action: Saving as drawing to database...");
+              const newDrawing = await prisma.drawing.create({
+                  data: {
+                      userId: userId,
+                      title: `Dessin ${new Date().toLocaleTimeString()}`, // Titre par défaut
+                      previewUrl: cloudinaryResult.secure_url,
+                      // Utiliser Prisma.JsonNull
+                      content: canvasStateJson ? JSON.parse(canvasStateJson) : Prisma.JsonNull,
+                      status: 'DRAFT',
+                  }
+              });
+              console.log("Server Action: Database save successful, Drawing ID:", newDrawing.id);
+              return { success: true, drawingId: newDrawing.id };
+          }
+
       } catch (error) {
           console.error("Server Action Error:", error);
           return { success: false, error: error instanceof Error ? error.message : "Une erreur serveur est survenue." };

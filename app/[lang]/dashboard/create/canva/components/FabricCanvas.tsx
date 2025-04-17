@@ -286,8 +286,8 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
    
    
    
-    // --- Fonction de Sauvegarde ---
-    const handleSave = async () => {
+    // --- Fonctions de Sauvegarde ---
+    const handleSaveAsDrawing = async () => {
         if (!fabricCanvasRef.current || isSaving || !dict) return;
         setIsSaving(true);
         setSaveMessage(dict.canva.save_in_progress);
@@ -307,6 +307,38 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
             if (result?.success && result.drawingId) {
                 setSaveMessage(dict.canva.save_success);
                 router.push(`/${lang}/dashboard/image2image/scribble/${result.drawingId}`);
+                // Pas besoin de setIsSaving(false) ici, la navigation se produit
+            } else {
+                 throw new Error(result?.error || "Erreur inconnue lors de la sauvegarde.");
+            }
+        } catch (error) {
+            console.error("Save failed:", error);
+            setSaveMessage(`${dict.canva.save_error}${error instanceof Error ? error.message : String(error)}`);
+            setIsSaving(false); // Termine le chargement seulement en cas d'erreur
+            setTimeout(() => setSaveMessage(null), 5000);
+        }
+    };
+    
+    const handleSaveAsGeneratedImage = async () => {
+        if (!fabricCanvasRef.current || isSaving || !dict) return;
+        setIsSaving(true);
+        setSaveMessage(dict.canva.save_in_progress);
+        try {
+            const canvas = fabricCanvasRef.current;
+            const imageDataUrl = canvas.toDataURL({ format: 'png', quality: 0.9 });
+            if (!imageDataUrl) throw new Error("Impossible de générer l'image.");
+
+            const filename = `generated-${Date.now()}.png`;
+            const imageFile = dataURLtoFile(imageDataUrl, filename);
+            if (!imageFile) throw new Error("Impossible de créer le fichier image.");
+
+            // Ici, nous devrions utiliser une action différente pour sauvegarder comme image générée
+            // Pour l'instant, nous utilisons saveDrawingAction avec un paramètre supplémentaire
+            const result = await saveDrawingAction(imageFile, undefined, true);
+
+            if (result?.success && result.drawingId) {
+                setSaveMessage(dict.canva.save_success);
+                router.push(`/${lang}/dashboard/gallery/image`);
                 // Pas besoin de setIsSaving(false) ici, la navigation se produit
             } else {
                  throw new Error(result?.error || "Erreur inconnue lors de la sauvegarde.");
@@ -381,10 +413,22 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
                 </Button>
                 <Input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageFileChange} className="hidden" />
 
-                {/* Bouton Enregistrer */}
-                <Button variant="default" size="sm" onClick={handleSave} disabled={isSaving}>
-                    {isSaving ? dict.canva.saving : dict.canva.save}
-                </Button>
+                {/* Menu Déroulant Sauvegarde */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="default" size="sm" disabled={isSaving}>
+                            {isSaving ? dict.canva.saving : dict.canva.save}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onSelect={handleSaveAsDrawing} disabled={isSaving}>
+                            {dict.canva.save_as_drawing || "Save as drawing"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={handleSaveAsGeneratedImage} disabled={isSaving}>
+                            {dict.canva.save_as_generated || "Save as generated image"}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 {/* Message de sauvegarde */}
                 {saveMessage && <span className="text-sm ml-2 text-muted-foreground">{saveMessage}</span>}

@@ -152,7 +152,9 @@
       "saving": "Saving...",
       "save_in_progress": "Save in progress...",
       "save_error": "Error: ",
-      "save_success": "Drawing saved! Redirecting..."
+      "save_success": "Drawing saved! Redirecting...",
+      "save_as_drawing": "Save as drawing",
+      "save_as_generated": "Save as generated image"
     },
     "nav": {
       "playground": "Playground",

@@ -39,27 +39,31 @@ aitubbb.com
 //suspend (sur la gallery)
 
 
-- passer le canva en 16:9
+
+
+
 - ajouter le choic des media / pas de redirection gallery
-- passer d'un mode a l'autre
-- le cas 0 pour image2sound
 
 - prolong video
+
 - pop up shadcn quand la video est prete depuis le webhook
-- ajout du language toggle ds la sidebar
-- creer le lecteur youtube + side bar droite + fermer sidebar gauche
-- lien pour mobile ds la sidebar
+
 - text2image au moins 2 model
-- save as generated pour le canva
+
 - resend
--arrenger la sidebar (HOme en haut) historique en bas avec le style different (projet)
-- use result as source dans variation
+
+- arrenger la sidebar (HOme en haut) historique en bas avec le style different (projet)
 
 - ajouter un icone musique dasn la gallerie video si il ya du son, mettre ajour la bdd apres ajou du son
-
-- publier les video en public et revalidate path
 
 - presentation page lecteur 
 
 - boutton ouvrir fermer sidebar
+
+- theme light, mal appliquer sur vignettes
+
+- refaire hompage
+- refaire footer
+- video presentation
+- favicon vercel ??
 

@@ -179,6 +179,8 @@ export interface TypeDictionary {
     save_in_progress: string;
     save_error: string;
     save_success: string;
+    save_as_drawing: string;
+    save_as_generated: string;
   };
   gallery: {
     title: string;
