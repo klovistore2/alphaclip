@@ -222,6 +222,8 @@ export interface TypeDictionary {
     improveVideo: string;
     improveVideo_addSound: string;
     improveVideo_makeLonger: string;
+    home: string,
+
   };
   userNav: {
     profile: string;

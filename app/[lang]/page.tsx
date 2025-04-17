@@ -2,9 +2,8 @@ import { getDictionary, Localy } from './dictionaries'
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
+import { ModeToggle } from '@/components/theme-toggle'
 
-
-export const dynamic = 'force-dynamic'
 
 
 export default async function Page({
@@ -38,7 +37,9 @@ export default async function Page({
       <header className="py-6 bg-background border-b">
         <div className="container flex items-center justify-between">
           <h1 className="text-3xl font-bold text-primary">{dict.metadata.title}</h1>
+          
           <LanguageSwitcher currentLang={lang} />
+           <ModeToggle />
         </div>
       </header>
 

@@ -199,7 +199,8 @@
       "generateVideo_imageToVideo": "Image to Video",
       "improveVideo": "Improve Video",
       "improveVideo_addSound": "Add Sound",
-      "improveVideo_makeLonger": "Extend Video"
+      "improveVideo_makeLonger": "Extend Video",
+      "home": "Home"
     },
     "userNav": { 
       "profile": "Profile",
@@ -219,8 +220,10 @@
       "share": "Share",
       "loading": "Loading...",
       "options":"Options",
-      "shareAction": "Partager (à implémenter)",
-      "downloadFailed": "Erreur: URL de téléchargement manquante."
+      "shareAction": "Share (to be implemented)",
+      "downloadFailed": "Error: Missing download URL.",
+      "makePublic": "Make public",
+      "makePrivate": "Make private"
   },
   "watchpage": {
     "suggestions": "Suggestions",

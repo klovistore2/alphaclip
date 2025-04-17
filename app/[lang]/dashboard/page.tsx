@@ -1,9 +1,9 @@
-// app/[lang]/page.tsx
+// app/[lang]/dashboard/page.tsx
+
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 import { getDictionary, Localy } from '../dictionaries'
-//import Link from 'next/link'
-//import { LanguageSwitcher } from '@/components/language-switcher'
-
 import { prisma } from '@/lib/prisma';
 import { AssetStatus } from '@prisma/client';
 import { VideoThumbnailCard } from '@/components/video-thumbnail-card'; // On va créer ce composant

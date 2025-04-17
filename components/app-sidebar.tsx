@@ -11,6 +11,7 @@ import {
   //PieChart,
   Film,
   //Music,
+  House,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -40,6 +41,12 @@ export function AppSidebar({ data,lang, ...props }: AppSidebarProps) {
 
 
   const navMainItems = [
+    {
+      title: data.sidebar.home,
+      url: "/dashboard",
+      icon: House,
+
+    },
     {
       title: data.sidebar.gallery,
       url: "#",
@@ -113,8 +120,8 @@ export function AppSidebar({ data,lang, ...props }: AppSidebarProps) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarTrigger className="-ml-1" />
       <SidebarHeader>
+        Home
       </SidebarHeader>
-      
       <SidebarContent>
         <NavMain items={navMainItems} />
       </SidebarContent>

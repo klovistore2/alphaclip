@@ -17,9 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Download, Music } from "lucide-react";
+import { MoreVertical, Download, Music, Globe, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toggleVideoPublicStatus } from "@/lib/actions/videoActions";
 
+// Utilisé juste comme forme attendue par notre composant
 interface Dictionary {
   gallery?: {
     thumbnail?: {
@@ -32,6 +34,19 @@ interface Dictionary {
   sidebar?: {
     improveVideo_addSound?: string;
   };
+  videoCard?: {
+    untitled?: string;
+    unknownUser?: string;
+    views?: string;
+    download?: string;
+    share?: string;
+    loading?: string;
+    options?: string;
+    downloadFailed?: string;
+    shareAction?: string;
+    makePublic?: string;
+    makePrivate?: string;
+  };
 }
 
 interface VideoCardProps {
@@ -41,6 +56,7 @@ interface VideoCardProps {
     title?: string | null;
     prompt?: string | null;
     videoUrl: string | null;
+    public?: boolean;
   };
   dictionary?: Dictionary;
   lang?: string;
@@ -55,7 +71,9 @@ export function VideoCard({ video, dictionary, lang }: VideoCardProps) {
     addSound: dictionary?.sidebar?.improveVideo_addSound || "Ajouter du son",
     openMenu: dictionary?.gallery?.thumbnail?.options || "Ouvrir le menu",
     untitled: dictionary?.gallery?.thumbnail?.untitled || "Vidéo sans titre",
-    cloudinaryError: dictionary?.gallery?.image_unavailable || "Erreur: ID Cloudinary manquant."
+    cloudinaryError: dictionary?.gallery?.image_unavailable || "Erreur: ID Cloudinary manquant.",
+    makePublic: dictionary?.videoCard?.makePublic || "Rendre publique",
+    makePrivate: dictionary?.videoCard?.makePrivate || "Rendre privée"
   };
 
   // Vérification au cas où, même si on filtre en amont
@@ -87,6 +105,26 @@ export function VideoCard({ video, dictionary, lang }: VideoCardProps) {
   const handleAddSound = () => {
     const basePath = lang ? `/${lang}` : '';
     router.push(`${basePath}/dashboard/improvevideo/addsound/${video.id}`);
+  };
+
+  const handleTogglePublic = async () => {
+    try {
+      // Utilisation directe du Server Action au lieu d'un appel fetch
+      const result = await toggleVideoPublicStatus(video.id);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // Pas besoin d'appeler router.refresh() car revalidatePath() est appelé dans l'action serveur
+      // Mais on peut l'ajouter quand même pour s'assurer que l'UI est mise à jour
+      router.refresh();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut public:', error);
+      alert(lang === 'fr' 
+        ? "Impossible de modifier le statut public de la vidéo."
+        : "Unable to update the public status of the video.");
+    }
   };
 
   return (
@@ -130,6 +168,19 @@ export function VideoCard({ video, dictionary, lang }: VideoCardProps) {
             <DropdownMenuItem onClick={handleAddSound}>
               <Music className="mr-2 h-4 w-4" />
               <span>{texts.addSound}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleTogglePublic}>
+              {video.public ? (
+                <>
+                  <Lock className="mr-2 h-4 w-4" />
+                  <span>{texts.makePrivate}</span>
+                </>
+              ) : (
+                <>
+                  <Globe className="mr-2 h-4 w-4" />
+                  <span>{texts.makePublic}</span>
+                </>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

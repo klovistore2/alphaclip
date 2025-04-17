@@ -1,8 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider"
 
-export async function generateStaticParams() {
-    return [{ lang: 'en' }, { lang: 'fr' }]
-  }
+
    
 export default async function LangLayout({
     children,

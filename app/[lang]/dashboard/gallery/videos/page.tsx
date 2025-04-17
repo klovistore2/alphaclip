@@ -34,7 +34,7 @@ export default async function GalleryVideoPage({
     redirect(`/api/auth/signin?callbackUrl=/${lang}/dashboard/gallery/videos`);
   }
 
-  // 3. Récupérer les vidéos de l'utilisateur depuis la base de données
+  // 3. Récupérer les vidéos de l'utilisateur depuis la base de données (qu'elles soient publiques ou non)
   const userVideos = await prisma.generatedVideo.findMany({
     where: {
       userId: session.user.id,
@@ -53,6 +53,7 @@ export default async function GalleryVideoPage({
       title: true,
       prompt: true,
       videoUrl: true,
+      public: true,
     }
   });
 
