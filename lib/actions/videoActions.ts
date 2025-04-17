@@ -7,6 +7,53 @@ import { revalidatePath } from "next/cache";
 /**
  * Action serveur pour basculer le statut public d'une vidéo
  */
+/**
+ * Action serveur pour mettre à jour le titre et la description d'une vidéo
+ */
+export async function updateVideoTitleDescription(videoId: string, title: string, description?: string) {
+  try {
+    // 1. Vérifier l'authentification
+    const session = await auth();
+    const userId = session?.user?.id;
+    
+    if (!userId) {
+      return { success: false, error: "Vous devez être connecté pour effectuer cette action." };
+    }
+
+    // 2. Mettre à jour la vidéo
+    const updatedVideo = await prisma.generatedVideo.update({
+      where: {
+        id: videoId,
+        userId: userId, // S'assurer que la vidéo appartient à l'utilisateur
+      },
+      data: {
+        title: title || null,
+        description: description || null,
+      },
+    });
+
+    // 3. Revalider les chemins pertinents pour mettre à jour l'UI
+    revalidatePath('/dashboard/gallery/videos');
+    revalidatePath('/dashboard');
+    revalidatePath('/');
+
+    return { 
+      success: true, 
+      video: {
+        id: updatedVideo.id,
+        title: updatedVideo.title,
+        description: updatedVideo.description,
+      },
+    };
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du titre et de la description:", error);
+    return { 
+      success: false, 
+      error: "Une erreur est survenue lors de la mise à jour des informations de la vidéo." 
+    };
+  }
+}
+
 export async function toggleVideoPublicStatus(videoId: string) {
   try {
     // 1. Vérifier l'authentification

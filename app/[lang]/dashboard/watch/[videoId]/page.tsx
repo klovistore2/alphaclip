@@ -23,7 +23,8 @@ export type MainVideoData = Prisma.GeneratedVideoGetPayload<{
     cloudinaryPublicId: string;
     videoUrl: string;
     views?: number | null; // Ou 'number | undefined' ou 'number | null | undefined' selon votre config stricte
-
+    description?: string | null;
+    prompt?: string | null; // Le prompt peut être utilisé comme description alternative si pas de description
 };
 
 // Type pour les vidéos suggérées (le même que celui de la galerie)

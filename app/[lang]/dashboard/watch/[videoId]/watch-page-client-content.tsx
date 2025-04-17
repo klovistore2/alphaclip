@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; //
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useMemo } from 'react'; // Pour la date formatée côté client
+import { Music } from "lucide-react"; // Pour l'icône de musique
 
 interface WatchPageClientContentProps {
     lang: Localy;
@@ -88,7 +89,12 @@ export function WatchPageClientContent({
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <p className="font-semibold text-foreground">{mainVideoData.user?.name || dictionary.videoCard?.unknownUser || "Utilisateur inconnu"}</p>
+                                <div className="flex items-center space-x-1">
+                                    <p className="font-semibold text-foreground">{mainVideoData.user?.name || dictionary.videoCard?.unknownUser || "Utilisateur inconnu"}</p>
+                                    {mainVideoData.sound && (
+                                        <Music className="h-4 w-4 text-blue-400" />
+                                    )}
+                                </div>
                                 {/* Ajouter le nombre d'abonnés si disponible */}
                             </div>
                         </div>
@@ -106,8 +112,15 @@ export function WatchPageClientContent({
                     {/* <div className="mt-4 flex gap-2"> ... boutons ... </div> */}
                 </div>
 
-                {/* Description (si vous en avez une) */}
-                {/* <div className="bg-muted p-3 rounded-lg text-sm"> ... description ... </div> */}
+                {/* Description */}
+                {(mainVideoData.description || mainVideoData.prompt) && (
+                    <div className="bg-muted p-4 rounded-lg mt-4">
+                        <h3 className="text-md font-medium mb-2">Description</h3>
+                        <p className="text-sm whitespace-pre-wrap">
+                            {mainVideoData.description || mainVideoData.prompt}
+                        </p>
+                    </div>
+                )}
 
                  {/* Section Commentaires (à implémenter plus tard) */}
                  {/* <div className="mt-6"> ... commentaires ... </div> */}

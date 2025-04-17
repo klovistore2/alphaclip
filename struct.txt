@@ -64,3 +64,4 @@ aitubbb.com
 - video presentation
 - favicon vercel ??
 - ajout traduction
+( pages intermediaire pour click sur menu principale sidebar)
