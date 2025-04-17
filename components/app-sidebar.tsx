@@ -119,9 +119,11 @@ export function AppSidebar({ data,lang, ...props }: AppSidebarProps) {
         <NavMain items={navMainItems} />
       </SidebarContent>
       
-      <SidebarFooter>
+      <SidebarFooter className="flex items-center justify-between space-x-4">
+      <div className="flex items-center space-x-2"> {/* Ou gap-x-2 */}
         <ModeToggle />
         <LanguageSwitcherIcon currentLang={lang} dictionary={data} />
+      </div>
         <NavUser dictionary={data} />
       </SidebarFooter>
       
