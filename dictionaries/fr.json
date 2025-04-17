@@ -1,4 +1,8 @@
 {
+  "languageSwitcher": {
+    "changeLanguage":"Changer de langue"
+}, 
+
   "products": {
     "cart": "Ajouter au panier",
     "text": "Texte"

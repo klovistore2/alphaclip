@@ -28,13 +28,14 @@ import {
 
 import { ModeToggle } from "@/components/theme-toggle"
 import { Localy, TypeDictionary } from '@/app/[lang]/dictionaries'; 
+import { LanguageSwitcherIcon } from "@/components/lang-switch-sidebar"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   data: TypeDictionary;
   lang: Localy;
 }
 
-export function AppSidebar({ data, ...props }: AppSidebarProps) {
+export function AppSidebar({ data,lang, ...props }: AppSidebarProps) {
   // Utiliser les traductions de la sidebar
 
 
@@ -120,6 +121,7 @@ export function AppSidebar({ data, ...props }: AppSidebarProps) {
       
       <SidebarFooter>
         <ModeToggle />
+        <LanguageSwitcherIcon currentLang={lang} dictionary={data} />
         <NavUser dictionary={data} />
       </SidebarFooter>
       

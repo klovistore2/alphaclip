@@ -22,6 +22,9 @@ export const getDictionary = async (locale: Localy): Promise<TypeDictionary> =>
   dictionaries[locale]();
 
 export interface TypeDictionary {
+  languageSwitcher : {
+    changeLanguage: string;
+  }
   metadata: {
     title: string;
     description: string;
