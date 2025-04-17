@@ -1,0 +1,302 @@
+{
+    "languageSwitcher": {
+      "changeLanguage": "言語を変更"
+    },
+    "products": {
+      "cart": "カートに追加",
+      "text": "テキスト"
+    },
+    "home": {
+      "siteTitle": "yatubbb",
+      "heroTitle": "受動的なスクロールは終わり、創造の時間です！",
+      "heroSubtitle": "YouTubeの受動的視聴の時代は終わりました。yatubbbでコントロールを握りましょう。あなたのスケッチを驚異的なビデオに変え、音を追加し、作品を共有しましょう。ここには受動的な視聴者はいません。大胆なクリエイターだけです。",
+      "featuresTitle": "どんな雰囲気？",
+      "featuresItems": [
+        {
+          "title": "スケッチからビデオへ一瞬で",
+          "desc": "あなたのスケッチが音のある・ないアニメーションクリップに変わり、バイラルヒットの準備が整います。"
+        },
+        {
+          "title": "完全な自由",
+          "desc": "自分でビデオを作成し、他人のビデオをリミックスし、想像力を刺激するストーリーから構築しましょう。"
+        },
+        {
+          "title": "制限なく共有",
+          "desc": "あなたの作品を公開し、世界に見せましょう。"
+        }
+      ],
+      "whyUsTitle": "なぜyatubbb？",
+      "whyUsText": "消費するだけで何も生み出さないプラットフォームにはうんざりしています。私たちのツールはシンプルで直感的で、自由な精神を持つ人々が自分の印を残すために設計されています。スケッチ → 画像 → ビデオ → 音 → バイラルヒット、こんなに簡単。",
+      "ctaTitle": "では、何を待っているの？",
+      "ctaText": "ペンとアイデアを持って、ルールを変えにきましょう。yatubbbはただのプラットフォームではありません。革命です。創造して、共有して、支配しましょう。",
+      "exploreGalleryText": "ギャラリーを探索",
+      "createNowText": "今すぐ作成",
+      "flowSteps": {
+        "drawing": "スケッチ",
+        "image": "画像",
+        "video": "ビデオ",
+        "sound": "音",
+        "viral": "バイラルヒット！"
+      }
+    },
+    "add_sound": {
+      "title": "音を追加",
+      "description": "ビデオに音を追加します。",
+      "prompt_label": "音の説明",
+      "prompt_placeholder": "音の雰囲気や効果音、音楽を説明してください（例：「穏やかな風と鳥のさえずり」、「壮大な音楽と爆発音」、「地面を走る馬のひづめの音」...）",
+      "loading": "ソースビデオを読み込んでいます...",
+      "source_video": "ソースビデオ",
+      "preview_unavailable": "プレビューは利用できません",
+      "processing_time": "音の追加には数分かかることがあります。",
+      "button": "音を追加",
+      "generating": "音を生成しています...",
+      "untitled": "無題のビデオ",
+      "view_video": "音付きビデオを見る",
+      "select_video": "ビデオを選択",
+      "no_video_selected": "ビデオが選択されていません",
+      "select_from_gallery": "ギャラリーから選択",
+      "errors": {
+        "invalid_source": "ソースビデオが読み込まれていないか、無効です。",
+        "missing_prompt": "音の説明を入力してください。",
+        "loading_failed": "ソースビデオを読み込めませんでした。",
+        "general": "音の追加に失敗しました。",
+        "no_video_selected": "ビデオが選択されていません。ギャラリーからビデオを選んでください。"
+      },
+      "success": "音の追加が開始されました。処理には数分かかることがあります。",
+      "how_it_works": {
+        "title": "使い方",
+        "step1_title": "1. ソースビデオ",
+        "step1_desc": "ページが選択したビデオを読み込みます。",
+        "step2_title": "2. 音を説明",
+        "step2_desc": "プロンプトを使用して、ビデオに追加する音を説明します。",
+        "step3_title": "3. お待ちください",
+        "step3_desc": "新しい音付きビデオの生成が開始され、数分かかることがあります。"
+      }
+    },
+    "scribble": {
+      "title": "スクリブルスペース",
+      "description": "スケッチから詳細な画像を生成します。",
+      "source_drawing": "ソーススケッチ",
+      "select_drawing": "スケッチを選択",
+      "loading": "スケッチを読み込んでいます...",
+      "loading_error": "読み込みエラー...",
+      "model_select": "モデルを選択",
+      "prompt_placeholder": "スケッチから生成したい画像を説明してください（例：「色鮮やかな山と湖の風景」、「長い髪の女性のリアルな肖像画」...）",
+      "button": "画像を生成",
+      "generating": "生成中...",
+      "source": "ソース",
+      "result": "結果",
+      "no_drawing": "スケッチが選択されていません",
+      "saved": "保存済み",
+      "generation_in_progress": "生成中...",
+      "full_size": "実寸サイズで表示",
+      "complete_info": "情報を入力して「画像を生成」をクリックしてください",
+      "errors": {
+        "invalid_source": "まず有効なソーススケッチを用意してください。",
+        "missing_prompt": "生成したい画像のプロンプトを入力してください。",
+        "missing_model": "生成モデルを選択してください。",
+        "loading_failed": "スケッチを読み込めませんでした。",
+        "general": "生成に失敗しましたか、画像が返されませんでした。"
+      }
+    },
+    "variation": {
+      "title": "画像のバリエーション",
+      "description": "既存の画像のバリエーションを作成します。",
+      "source_image": "ソース画像",
+      "select_image": "画像を選択",
+      "loading": "画像を読み込んでいます...",
+      "loading_error": "読み込みエラー...",
+      "prompt_placeholder": "画像に加えたい変更を説明してください（例：「この画像をカートゥーンスタイルに変える」、「被写体の隣に猫を追加する」...）",
+      "button": "Geminiで画像を変更",
+      "generating": "変更中...",
+      "source": "ソース",
+      "result": "結果",
+      "no_image": "画像が選択されていません",
+      "saved": "保存済み",
+      "generation_in_progress": "生成中...",
+      "full_size": "実寸サイズで表示",
+      "complete_info": "プロンプトを入力して「画像を変更」をクリックしてバリエーションを生成してください",
+      "use_as_source": "新しいソースとして使用",
+      "errors": {
+        "invalid_source": "まずソース画像を選択してください。",
+        "missing_prompt": "変更したい内容のプロンプトを入力してください。",
+        "loading_failed": "画像を読み込めませんでした。",
+        "general": "生成に失敗しましたか、画像が返されませんでした。"
+      }
+    },
+    "image2video": {
+      "title": "ビデオ生成",
+      "description": "画像をアニメーションビデオに変換します。",
+      "source_image": "ソース画像",
+      "select_image": "画像を選択",
+      "loading": "画像を読み込んでいます...",
+      "loading_error": "読み込みエラー...",
+      "no_image": "画像が選択されていません",
+      "video_description": "ビデオの説明",
+      "prompt_placeholder": "生成したいビデオを説明してください...",
+      "video_length": "ビデオの長さ（秒）",
+      "fps": "フレームレート（FPS）",
+      "fps_value": "FPS",
+      "prompt_optimizer": "プロンプトオプティマイザー（推奨）",
+      "processing_time": "生成には数分かかることがあります。",
+      "button": "ビデオを生成",
+      "generating": "生成中...",
+      "mobile_message": "完全なインターフェースはデスクトップでご利用ください",
+      "view_gallery": "ギャラリーで表示",
+      "success_message": "ビデオの生成が正常に開始されました。処理には数分かかることがあります。",
+      "how_it_works": {
+        "title": "使い方",
+        "step1_title": "1. 画像を選択",
+        "step1_desc": "ギャラリーから生成された画像を出発点として選択します。",
+        "step2_title": "2. ビデオを説明",
+        "step2_desc": "プロンプトを使用してビデオの生成をガイドします。",
+        "step3_title": "3. 数分お待ちください",
+        "step3_desc": "生成はバックグラウンドで開始され、3-5分かかることがあります。通知が届きます。"
+      },
+      "errors": {
+        "invalid_source": "まずソース画像を選択してください。",
+        "missing_prompt": "ビデオの説明を入力してください。",
+        "loading_failed": "画像を読み込めませんでした。",
+        "general": "ビデオの生成に失敗しました。"
+      }
+    },
+    "create_image": {
+      "title": "画像を作成",
+      "description": "テキストの説明から画像を作成します。",
+      "prompt": "画像を生成するためのテキストの説明を入力してください。",
+      "button": "画像を生成"
+    },
+    "canva": {
+      "title": "キャンバスで描く",
+      "selection": "選択",
+      "pen": "ペン",
+      "thickness": "太さ",
+      "thin": "細い（1px）",
+      "medium": "中（3px）",
+      "thick": "太い（8px）",
+      "shapes": "形",
+      "square": "四角",
+      "circle": "円",
+      "triangle": "三角",
+      "line": "バー（線）",
+      "import_image": "画像をインポート",
+      "save": "保存",
+      "saving": "保存中...",
+      "save_in_progress": "保存中...",
+      "save_error": "エラー：",
+      "save_success": "スケッチが保存されました！リダイレクト中...",
+      "save_as_drawing": "スケッチとして保存",
+      "save_as_generated": "生成された画像として保存"
+    },
+    "nav": {
+      "playground": "プレイグラウンド",
+      "playgroundAI": "AIプレイグラウンド",
+      "paintStudio": "ペイントスタジオ",
+      "models": "モデル"
+    },
+    "gallery": {
+      "title": "ギャラリー",
+      "subtitle": "あなたのクリエイションと生成された画像。",
+      "my_drawings": "私のスケッチ",
+      "my_generated_images": "私の生成された画像",
+      "no_drawings": "まだスケッチが保存されていません。",
+      "no_generated_images": "まだコンテンツが生成されていません。",
+      "no_videos": "現在、公開されているビデオはありません。",
+      "login_required": "スケッチを見るにはログインしてください。",
+      "preview_unavailable": "プレビューは利用できません",
+      "image_unavailable": "画像は利用できません",
+      "public_videos": "公開ビデオ",
+      "gallery_video": "公開ビデオ",
+      "thumbnail": {
+        "view_full": "拡大表示",
+        "open_in_scribble": "スクリブルで開く",
+        "open_in_variation": "バリエーションで開く",
+        "open_in_image2video": "Image2Videoで開く",
+        "download": "ダウンロード",
+        "options": "オプション",
+        "untitled": "無題"
+      }
+    },
+    "metadata": {
+      "title": "yatubbb",
+      "description": "AIによって生成された画像やビデオの作成と共有を容易にします。テキストから画像を作成し、編集し、画像からビデオを生成することもできます。このプラットフォームは使いやすく、クリエイティブなプロセスをサポートするためのさまざまなツールを提供しています。"
+    },
+    "sidebar": {
+      "gallery": "ギャラリー",
+      "gallery_image": "画像",
+      "gallery_video": "ビデオ",
+      "createImage": "画像を作成",
+      "createImage_canva": "Canva",
+      "imageToImage": "画像から画像",
+      "imageToImage_scribble": "スクリブル",
+      "imageToImage_variation": "画像のバリエーション",
+      "generateVideo": "ビデオを生成",
+      "generateVideo_imageToVideo": "画像からビデオ",
+      "improveVideo": "ビデオを改善",
+      "improveVideo_addSound": "音を追加",
+      "improveVideo_makeLonger": "ビデオを長くする",
+      "home": "ホーム"
+    },
+    "userNav": {
+      "profile": "プロフィール",
+      "settings": "設定",
+      "signIn": "ログイン",
+      "loading": "読み込んでいます...",
+      "account": "アカウント",
+      "billing": "課金",
+      "upgrade": "プロにアップグレード",
+      "logOut": "ログアウト"
+    },
+    "videoCard": {
+      "untitled": "無題のビデオ",
+      "unknownUser": "不明なユーザー",
+      "views": "ビュー",
+      "download": "ダウンロード",
+      "share": "共有",
+      "loading": "読み込んでいます...",
+      "options": "オプション",
+      "shareAction": "共有（実装予定）",
+      "downloadFailed": "エラー：ダウンロードURLがありません。",
+      "makePublic": "公開にする",
+      "makePrivate": "非公開にする"
+    },
+    "watchpage": {
+      "suggestions": "おすすめ",
+      "no_suggestions": "現在、おすすめはありません。"
+    },
+    "extend_video": {
+      "title": "ビデオを長くする",
+      "description": "ビデオの内容を延長して、より長いビデオにします。",
+      "source_video": "ソースビデオ",
+      "prompt_label": "延長の説明",
+      "prompt_placeholder": "ビデオをどのように延長したいか説明してください...",
+      "loading": "ソースビデオを読み込んでいます...",
+      "preview_unavailable": "プレビューは利用できません",
+      "processing_time": "ビデオの延長には数分かかることがあります。",
+      "button": "ビデオを延長",
+      "generating": "ビデオを延長しています...",
+      "untitled": "無題のビデオ",
+      "view_video": "延長されたビデオを見る",
+      "select_video": "ビデオを選択",
+      "no_video_selected": "ビデオが選択されていません",
+      "select_from_gallery": "ギャラリーから選択",
+      "errors": {
+        "invalid_source": "ソースビデオが読み込まれていないか、無効です。",
+        "missing_prompt": "延長の説明を入力してください。",
+        "loading_failed": "ソースビデオを読み込めませんでした。",
+        "general": "ビデオの延長に失敗しました。",
+        "no_video_selected": "ビデオが選択されていません。ギャラリーからビデオを選んでください。"
+      },
+      "success": "ビデオの延長が開始されました。処理には数分かかることがあります。",
+      "how_it_works": {
+        "title": "使い方",
+        "step1_title": "1. ソースビデオ",
+        "step1_desc": "ページが選択したビデオを読み込みます。",
+        "step2_title": "2. 延長を説明",
+        "step2_desc": "プロンプトを使用して、ビデオをどのように延長したいか説明します。",
+        "step3_title": "3. お待ちください",
+        "step3_desc": "延長されたビデオの生成が開始され、数分かかることがあります。"
+      }
+    }
+  }
+  

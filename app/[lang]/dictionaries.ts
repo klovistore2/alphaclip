@@ -2,20 +2,22 @@
 
 // Suppression de server-only pour permettre l'import côté client
  
-export type Localy = 'en' | 'fr';
+export type Localy = 'en' | 'fr' | 'ja';
 
 const dictionaries = {
   en: () => import('@/dictionaries/en.json').then((module) => module.default),
   fr: () => import('@/dictionaries/fr.json').then((module) => module.default),
+  ja: () => import('@/dictionaries/ja.json').then((module) => module.default),
 }
  
 export const languageNames: Record<Localy, string> = {
   en: "English",
   fr: "Français",
+  ja: "日本語",
 
 }
 
-export const locales_ = ["en", "fr"] as const
+export const locales_ = ["en", "fr", "ja"] as const
 
 
 export const getDictionary = async (locale: Localy): Promise<TypeDictionary> =>
