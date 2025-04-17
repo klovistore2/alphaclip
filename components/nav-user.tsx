@@ -55,9 +55,9 @@ export function NavUser({
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <Button variant="outline" onClick={() => signIn()} className="w-full">
-            <LogIn className="mr-2 h-4 w-4" />
-            {dictionary?.userNav?.signIn || "Sign In"}
+          <Button variant="outline" onClick={() => signIn()} className="w-full group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8">
+            <LogIn className="mr-2 h-4 w-4 group-data-[collapsible=icon]:mr-0" />
+            <span className="group-data-[collapsible=icon]:hidden">{dictionary?.userNav?.signIn || "Sign In"}</span>
           </Button>
         </SidebarMenuItem>
       </SidebarMenu>
