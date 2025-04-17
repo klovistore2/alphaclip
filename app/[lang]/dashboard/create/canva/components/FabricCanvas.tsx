@@ -63,7 +63,7 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
     // Utiliser le dictionnaire passé en prop
     const dict = dictionary;
 
-    // --- Effet Principal (Setup + Keydown Listener) ---
+    // --- Effet d'initialisation du Canvas (sans dépendance à activeTool) ---
     useEffect(() => {
         if (canvasRef.current && canvasContainerRef.current) {
             const canvasElement = canvasRef.current;
@@ -93,49 +93,9 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
             resizeObserver.observe(containerElement);
             resizeCanvas();
 
-            const handleKeyDown = (event: KeyboardEvent) => {
-                // Vérifie si le canevas existe
-                if (!fabricCanvasRef.current) return;
-
-                if (activeTool !== 'select') return;
-
-                 // Vérifie si la touche est Delete ou Backspace
-                if (event.key === 'Delete' || event.key === 'Backspace') {
-                    const activeObject = fabricCanvasRef.current.getActiveObject();
-
-                    // Vérifie si un objet (ou un groupe) est sélectionné
-                    if (activeObject) {
-                        // Si c'est une sélection multiple (groupe)
-                        // Note: _objects est une propriété interne mais couramment utilisée pour ActiveSelection
-                        if (activeObject.type === 'activeSelection') {
-                            // Cast vers le type spécifique pour accéder à _objects en toute sécurité (type-safe)
-                            const activeSelection = activeObject as fabric.ActiveSelection;
-                            if (activeSelection._objects) { // Vérifie que _objects existe
-                                activeSelection._objects.forEach(obj => {
-                                    fabricCanvasRef.current?.remove(obj);
-                                });
-                            }
-                        } else {
-                            // C'est un objet unique
-                            fabricCanvasRef.current.remove(activeObject);
-                        }
-                        // Désélectionne tout
-                        fabricCanvasRef.current.discardActiveObject();
-                        // Redessine le canevas
-                        fabricCanvasRef.current.renderAll();
-
-                        console.log('Object(s) deleted');
-                         // Optionnel: Empêche le comportement par défaut (ex: retour arrière dans le navigateur)
-                        // event.preventDefault();
-                    }
-                }
-            };
-            window.addEventListener('keydown', handleKeyDown);
-
             // Nettoyage
             return () => {
                 resizeObserver.unobserve(containerElement);
-                window.removeEventListener('keydown', handleKeyDown);
                 if (fabricCanvasRef.current) {
                     fabricCanvasRef.current.dispose();
                     fabricCanvasRef.current = null;
@@ -143,7 +103,55 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
                 console.log("Fabric canvas disposed on cleanup");
             };
         }
-    }, [activeTool]); // Ajout de la dépendance manquante
+    }, []); // Plus de dépendance à activeTool
+
+    // --- Effet séparé pour le gestionnaire de touche ---
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Vérifie si le canevas existe
+            if (!fabricCanvasRef.current) return;
+
+            if (activeTool !== 'select') return;
+
+            // Vérifie si la touche est Delete ou Backspace
+            if (event.key === 'Delete' || event.key === 'Backspace') {
+                const activeObject = fabricCanvasRef.current.getActiveObject();
+
+                // Vérifie si un objet (ou un groupe) est sélectionné
+                if (activeObject) {
+                    // Si c'est une sélection multiple (groupe)
+                    // Note: _objects est une propriété interne mais couramment utilisée pour ActiveSelection
+                    if (activeObject.type === 'activeSelection') {
+                        // Cast vers le type spécifique pour accéder à _objects en toute sécurité (type-safe)
+                        const activeSelection = activeObject as fabric.ActiveSelection;
+                        if (activeSelection._objects) { // Vérifie que _objects existe
+                            activeSelection._objects.forEach(obj => {
+                                fabricCanvasRef.current?.remove(obj);
+                            });
+                        }
+                    } else {
+                        // C'est un objet unique
+                        fabricCanvasRef.current.remove(activeObject);
+                    }
+                    // Désélectionne tout
+                    fabricCanvasRef.current.discardActiveObject();
+                    // Redessine le canevas
+                    fabricCanvasRef.current.renderAll();
+
+                    console.log('Object(s) deleted');
+                    // Optionnel: Empêche le comportement par défaut (ex: retour arrière dans le navigateur)
+                    // event.preventDefault();
+                }
+            }
+        };
+        
+        window.addEventListener('keydown', handleKeyDown);
+        
+        // Nettoyage
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [activeTool]); // Garde la dépendance à activeTool pour ce hook uniquement
 
 
 
@@ -151,7 +159,7 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
         const activateSelectMode = () => {
             if (!fabricCanvasRef.current) return;
             fabricCanvasRef.current.isDrawingMode = false; // Désactive le mode dessin
-            setActiveTool('select'); // Met à jour l'état
+            setActiveTool('select'); // Met à jour l'état uniquement pour le gestionnaire de touche
             console.log("Switched to Select mode");
         };
     
@@ -167,10 +175,13 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
         };
     
         const ensureSelectMode = (callback: () => void) => {
-            // Appelle la nouvelle fonction pour passer en mode sélection
-            activateSelectMode();
-            // Le setTimeout est toujours utile pour décaler l'exécution du callback
-            setTimeout(callback, 0);
+            // Au lieu de changer le mode et déclencher le useEffect, configurons directement isDrawingMode
+            if (fabricCanvasRef.current) {
+                fabricCanvasRef.current.isDrawingMode = false; // Désactive le mode dessin
+            }
+            setActiveTool('select'); // Met à jour l'état mais n'affecte que le gestionnaire de touche
+            // Exécute le callback immédiatement - pas besoin de setTimeout car nous ne recréons plus le canvas
+            callback();
         };
     
         const addRectangle = () => {
