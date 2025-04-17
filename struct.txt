@@ -42,7 +42,6 @@ aitubbb.com
 
 
 
-- ajouter le choic des media / pas de redirection gallery
 
 - prolong video
 
@@ -53,16 +52,20 @@ aitubbb.com
 
 - arrenger la sidebar (HOme en haut) historique en bas avec le style different (projet)
 
-- presentation page lecteur, commentiares ??
+- watch commentiares ??
 
 - boutton ouvrir fermer sidebar
 
 - theme light, mal appliquer sur vignettes
 
 - refaire hompage
+
 - refaire footer
+
 - video presentation
+
 - favicon vercel ??
+
 - ajout traduction
 ( pages intermediaire pour click sur menu principale sidebar)
 

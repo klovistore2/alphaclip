@@ -29,6 +29,40 @@ export interface TypeDictionary {
     title: string;
     description: string;
   };
+  extend_video: {
+    title: string;
+    description: string;
+    source_video: string;
+    prompt_label: string;
+    prompt_placeholder: string;
+    loading: string;
+    preview_unavailable: string;
+    processing_time: string;
+    button: string;
+    generating: string;
+    untitled: string;
+    view_video: string;
+    select_video: string;
+    no_video_selected: string;
+    select_from_gallery: string;
+    errors: {
+      invalid_source: string;
+      missing_prompt: string;
+      loading_failed: string;
+      general: string;
+      no_video_selected: string;
+    };
+    success: string;
+    how_it_works: {
+      title: string;
+      step1_title: string;
+      step1_desc: string;
+      step2_title: string;
+      step2_desc: string;
+      step3_title: string;
+      step3_desc: string;
+    }
+  };
   products?: {
     cart: string;
     text: string;

@@ -231,5 +231,39 @@
   "watchpage": {
     "suggestions": "Suggestions",
     "no_suggestions": "Aucune suggestion pour le moment."
+  },
+  "extend_video": {
+    "title": "Prolonger la Vidéo",
+    "description": "Rendez votre vidéo plus longue en prolongeant son contenu.",
+    "source_video": "Vidéo Source",
+    "prompt_label": "Description de l'extension",
+    "prompt_placeholder": "Décrivez comment vous souhaitez prolonger la vidéo...",
+    "loading": "Chargement de la vidéo source...",
+    "preview_unavailable": "Prévisualisation indisponible",
+    "processing_time": "L'extension de la vidéo peut prendre quelques minutes.",
+    "button": "Prolonger la Vidéo",
+    "generating": "Extension de la vidéo...",
+    "untitled": "Vidéo sans titre",
+    "view_video": "Voir la vidéo prolongée",
+    "select_video": "Sélectionner une vidéo",
+    "no_video_selected": "Aucune vidéo sélectionnée",
+    "select_from_gallery": "Sélectionner depuis la galerie",
+    "errors": {
+      "invalid_source": "La vidéo source n'est pas chargée ou est invalide.",
+      "missing_prompt": "Veuillez entrer une description pour l'extension.",
+      "loading_failed": "Impossible de charger la vidéo source.",
+      "general": "L'extension de la vidéo a échoué.",
+      "no_video_selected": "Aucune vidéo sélectionnée. Veuillez choisir une vidéo depuis la galerie."
+    },
+    "success": "L'extension de la vidéo a été lancée. Le traitement peut prendre plusieurs minutes.",
+    "how_it_works": {
+      "title": "Comment ça fonctionne",
+      "step1_title": "1. Vidéo Source",
+      "step1_desc": "La page charge la vidéo que vous avez sélectionnée.",
+      "step2_title": "2. Décrivez l'extension",
+      "step2_desc": "Utilisez un prompt pour décrire comment vous souhaitez que la vidéo soit prolongée.",
+      "step3_title": "3. Patientez",
+      "step3_desc": "La génération de la vidéo prolongée est lancée et peut prendre quelques minutes."
+    }
   }
 }

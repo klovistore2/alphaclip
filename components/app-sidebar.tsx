@@ -110,7 +110,7 @@ export function AppSidebar({ data,lang, ...props }: AppSidebarProps) {
         },
         {
           title: data.sidebar.improveVideo_makeLonger,
-          url: "/dashboard/improvevideo/extend/0",
+          url: "/dashboard/improvevideo/extendvideo/0",
         },
       ],
     },
