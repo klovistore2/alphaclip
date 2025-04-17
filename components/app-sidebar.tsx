@@ -25,11 +25,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ data, lang, ...props }: AppSidebarProps) {
   // Home as a standalone item
-  const homeItem = {
-    title: data.sidebar.home,
-    url: "/dashboard",
-    icon: House,
-  }
+
 
   // Gallery now points directly to the image gallery
   const galleryItem = {
