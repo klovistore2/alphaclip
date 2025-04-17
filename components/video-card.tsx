@@ -57,6 +57,7 @@ interface VideoCardProps {
     prompt?: string | null;
     videoUrl: string | null;
     public?: boolean;
+    sound?: boolean;
   };
   dictionary?: Dictionary;
   lang?: string;
@@ -143,9 +144,14 @@ export function VideoCard({ video, dictionary, lang }: VideoCardProps) {
 
       <CardFooter className="flex flex-row items-center justify-between py-2 px-3 mt-auto">
         <div className="flex-1 space-y-0 mr-2 overflow-hidden">
-          <CardTitle className="text-sm font-medium truncate block text-white">
-            {video.title || video.prompt || texts.untitled}
-          </CardTitle>
+          <div className="flex items-center space-x-1">
+            <CardTitle className="text-sm font-medium truncate block text-white">
+              {video.title || video.prompt || texts.untitled}
+            </CardTitle>
+            {video.sound && (
+              <Music className="h-4 w-4 text-blue-400" />
+            )}
+          </div>
           {(video.prompt && video.title && video.prompt !== video.title || video.prompt && !video.title) && (
             <CardDescription className="text-xs truncate block text-gray-400">
               {video.prompt}

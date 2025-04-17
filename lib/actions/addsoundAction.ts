@@ -59,10 +59,13 @@ export async function addSoundToVideoAction(
     }
 
 
-    if (!params.sourceVideoUrl || !params.prompt || !params.sourceVideoId) {
+    if (!params.sourceVideoUrl || !params.sourceVideoId) {
         console.error("Server Action Error: Missing required parameters.");
-        return { success: false, error: "Paramètres manquants (vidéo source, ID vidéo ou prompt)." };
+        return { success: false, error: "Paramètres manquants (vidéo source ou ID vidéo)." };
     }
+    
+    // Le prompt est désormais optionnel, utilisons une valeur par défaut si non fourni
+    const soundPrompt = params.prompt || "";
 
     try {
         // 3. Vérifier que la vidéo source existe et appartient à l'utilisateur
@@ -86,13 +89,13 @@ export async function addSoundToVideoAction(
         const newVideoWithSound = await prisma.generatedVideo.create({
             data: {
                 status: AssetStatus.PENDING,
-                prompt: params.prompt, // Ce prompt est pour le *son*
+                prompt: soundPrompt, // Ce prompt est pour le *son*
                 title: sourceVideo.title ? `${sourceVideo.title} (avec son)` : `Vidéo avec son`, // Nouveau titre
                 description: sourceVideo.description, // Copier la description ?
                 modelUsed: "zsxkib/mmaudio", // Nom du modèle d'ajout de son
                 parameters: {
                     sourcePrompt: sourceVideo.prompt, // Garder le prompt original de la vidéo
-                    soundPrompt: params.prompt, // Le prompt utilisé pour le son
+                    soundPrompt: soundPrompt, // Le prompt utilisé pour le son
                     seed: params.seed ?? -1,
                     sourceVideoId: params.sourceVideoId, // Lien vers la vidéo parente
                 },
@@ -112,7 +115,7 @@ export async function addSoundToVideoAction(
         const generationLog = await prisma.generationLog.create({
              data: {
                  type: "VIDEO_ADD_SOUND",
-                 prompt: params.prompt,
+                 prompt: soundPrompt,
                  modelUsed: "zsxkib/mmaudio",
                  parameters: {
                      seed: params.seed ?? -1,
@@ -137,7 +140,7 @@ export async function addSoundToVideoAction(
         // 7. Préparer l'entrée pour le modèle Replicate 'zsxkib/mmaudio'
         const modelInput = {
             video: actualSourceVideoUrl, // Utiliser l'URL Cloudinary de la vidéo source
-            prompt: params.prompt,
+            prompt: soundPrompt,
             seed: params.seed ?? -1,
         };
         console.log("Server Action: Prepared mmaudio model input:", modelInput);

@@ -54,6 +54,7 @@ export default async function GalleryVideoPage({
       prompt: true,
       videoUrl: true,
       public: true,
+      sound: true, // Ajout du champ son
     }
   });
 

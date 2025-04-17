@@ -98,4 +98,5 @@ export type VideoWithUserData = Prisma.GeneratedVideoGetPayload<{
   // --- FIN MODIFICATION ---
   createdAt: Date;
   views?: number;
+  sound?: boolean; // Indicateur si la vidéo a du son
 };

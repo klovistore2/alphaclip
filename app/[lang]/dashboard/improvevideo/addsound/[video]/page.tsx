@@ -124,13 +124,11 @@ export default function AddSoundPage() {
 
     // --- Fonction pour lancer la génération de son ---
     const handleAddSound = async () => {
-        if (!sourceVideo || !sourceVideo.videoUrl || !prompt || isGenerating) {
+        if (!sourceVideo || !sourceVideo.videoUrl || isGenerating) {
             if (!sourceVideo || !sourceVideo.videoUrl) {
                 setGenerationError(dict?.add_sound?.errors?.invalid_source || "Source video is not loaded or is invalid.");
-            } else if (!prompt) {
-                setGenerationError(dict?.add_sound?.errors?.missing_prompt || "Please enter a description for the sound.");
             }
-            if (!sourceVideo || !sourceVideo.videoUrl || !prompt) return;
+            if (!sourceVideo || !sourceVideo.videoUrl) return;
             if (isGenerating) return;
         }
 
@@ -264,7 +262,7 @@ export default function AddSoundPage() {
                             <Card className="col-span-1 lg:col-span-2">
                                 <CardContent className="p-4 space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="prompt-input">{dict.add_sound.prompt_label}</Label>
+                                        <Label htmlFor="prompt-input">{dict.add_sound.prompt_label} <span className="text-muted-foreground font-normal ml-1">(optionnel)</span></Label>
                                         <Textarea
                                             id="prompt-input"
                                             value={prompt}
@@ -284,7 +282,7 @@ export default function AddSoundPage() {
                                             onClick={videoId === '0' ? 
                                                 () => router.push(`/${lang}/dashboard/gallery/videos`) : 
                                                 handleAddSound}
-                                            disabled={videoId !== '0' && (isGenerating || !prompt || !sourceVideo)}
+                                            disabled={videoId !== '0' && (isGenerating || !sourceVideo)}
                                             size="lg"
                                         >
                                             {videoId === '0' ? (
