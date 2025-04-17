@@ -110,6 +110,7 @@ export interface TypeDictionary {
     generation_in_progress: string;
     full_size: string;
     complete_info: string;
+    use_as_source: string;
     errors: {
       invalid_source: string;
       missing_prompt: string;

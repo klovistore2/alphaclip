@@ -3,13 +3,19 @@
 
 import { useState, useEffect } from 'react';
 import Image from "next/image"
-import { Wand2, Loader2, ImagePlus } from "lucide-react"
+import { Wand2, Loader2, ImagePlus, MoreVertical, Download, Video, RefreshCw } from "lucide-react"
 import { useParams, useRouter } from 'next/navigation';
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -381,7 +387,7 @@ export default function ImageVariationPage() {
                                     </CardContent>
                                 </Card>
                                 {/* Boutons d'action pour l'image générée */}
-                                {generatedUrls && generatedUrls.length > 0 && (
+                                {generatedUrls && generatedUrls.length > 0 && generatedImageId && (
                                     <div className="flex justify-end gap-2">
                                         <Button 
                                             variant="outline" 
@@ -390,6 +396,36 @@ export default function ImageVariationPage() {
                                         >
                                             {dict.variation.full_size}
                                         </Button>
+                                        
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="sm">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                    <span className="sr-only">Options</span>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => router.push(`/${lang}/dashboard/image2image/variation/${generatedImageId}`)}>
+                                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                                    <span>{dict.variation.use_as_source || "Use as New Source"}</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => router.push(`/${lang}/dashboard/videogenerate/image2video/${generatedImageId}`)}>
+                                                    <Video className="mr-2 h-4 w-4" />
+                                                    <span>{dict.gallery?.thumbnail?.open_in_image2video || "Turn into Video"}</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => {
+                                                    const link = document.createElement('a');
+                                                    link.href = generatedUrls[0];
+                                                    link.download = `variation-image-${Date.now()}.png`;
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }}>
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    <span>{dict.gallery?.thumbnail?.download || "Download"}</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 )}
                             </div>

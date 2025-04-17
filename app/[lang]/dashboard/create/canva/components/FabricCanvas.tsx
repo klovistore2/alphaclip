@@ -394,7 +394,7 @@ const FabricCanvas: React.FC<FabricCanvasProps> = ({ lang, dictionary }) => {
             {/* Conteneur DU CANEVAS */}
             <div
                 ref={canvasContainerRef}
-                className="relative w-full max-w-4xl aspect-square shadow-xl overflow-hidden bg-white mx-auto my-4" // Centrage
+                className="relative w-full max-w-4xl aspect-video shadow-xl overflow-hidden bg-white border-2 border-gray-300 dark:border-gray-700 mx-auto my-4" // Ratio 16:9 et bordures améliorées
             >
                 <canvas ref={canvasRef} className="w-full h-full" />
             </div>

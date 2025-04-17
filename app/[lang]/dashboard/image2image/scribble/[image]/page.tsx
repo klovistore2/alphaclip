@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from "next/image"
-import { PencilLine, Loader2, ImagePlus } from "lucide-react"
+import { PencilLine, Loader2, ImagePlus, MoreVertical, Download, Wand2, Video } from "lucide-react"
 import { useParams, useRouter } from 'next/navigation';
 
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,12 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select} from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 import { generateScribbleImageAction } from '@/lib/actions/scribbleAction';
@@ -401,7 +407,7 @@ export default function ScribblePlaygroundPage() {
                                     </CardContent>
                                 </Card>
                                 {/* Boutons d'action pour l'image générée (télécharger, etc.) */}
-                                {generatedUrls && generatedUrls.length > 0 && (
+                                {generatedUrls && generatedUrls.length > 0 && generatedImageId && (
                                     <div className="flex justify-end gap-2">
                                         <Button 
                                             variant="outline" 
@@ -410,6 +416,36 @@ export default function ScribblePlaygroundPage() {
                                         >
                                             {dict.scribble.full_size}
                                         </Button>
+                                        
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="sm">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                    <span className="sr-only">Options</span>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => router.push(`/${lang}/dashboard/image2image/variation/${generatedImageId}`)}>
+                                                    <Wand2 className="mr-2 h-4 w-4" />
+                                                    <span>{dict.gallery?.thumbnail?.open_in_variation || "Open in Variation"}</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => router.push(`/${lang}/dashboard/videogenerate/image2video/${generatedImageId}`)}>
+                                                    <Video className="mr-2 h-4 w-4" />
+                                                    <span>{dict.gallery?.thumbnail?.open_in_image2video || "Turn into Video"}</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => {
+                                                    const link = document.createElement('a');
+                                                    link.href = generatedUrls[0];
+                                                    link.download = `generated-image-${Date.now()}.png`;
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }}>
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    <span>{dict.gallery?.thumbnail?.download || "Download"}</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 )}
                             </div>

@@ -84,6 +84,7 @@
     "generation_in_progress": "Génération en cours...",
     "full_size": "Voir en taille réelle",
     "complete_info": "Complétez le prompt et cliquez sur Modifier l'Image pour générer une variation",
+    "use_as_source": "Utiliser comme nouvelle source",
     "errors": {
       "invalid_source": "Veuillez d'abord sélectionner une image source.",
       "missing_prompt": "Veuillez entrer un prompt décrivant la modification souhaitée.",
