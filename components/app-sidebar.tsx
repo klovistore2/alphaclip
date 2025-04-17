@@ -30,7 +30,7 @@ export function AppSidebar({ data, lang, ...props }: AppSidebarProps) {
   // Gallery now points directly to the image gallery
   const galleryItem = {
     title: data.sidebar.gallery,
-    url: "/dashboard/gallery/image", // Direct link to image gallery
+    url: "#", // Direct link to image gallery
     icon: BookOpen,
     items: [
       {
@@ -74,7 +74,7 @@ export function AppSidebar({ data, lang, ...props }: AppSidebarProps) {
     },
     {
       title: data.sidebar.generateVideo,
-      url: "/dashboard/videogenerate/image2video/0",
+      url: "#",
       icon: Video,
       items: [
         {
