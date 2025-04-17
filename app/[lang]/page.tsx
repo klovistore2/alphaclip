@@ -22,7 +22,7 @@ export default async function Page({
         <div className="container flex items-center justify-between relative z-10">
           <div className="flex items-center gap-3">
             <Image
-              src="/android-chrome-192x192.png"
+              src="https://res.cloudinary.com/dwgtpzjpw/image/upload/v1744909236/icon-32x32_xogyh9.png"
               alt={dict.metadata.title}
               width={40}
               height={40}
@@ -62,7 +62,7 @@ export default async function Page({
               <div className="flex justify-center">
                 <div className="relative h-64 w-64 md:h-96 md:w-96">
                   <Image
-                    src="/android-chrome-512x512.png"
+                    src="https://res.cloudinary.com/dwgtpzjpw/image/upload/v1744909236/android-chrome-512x512_sji8y9.png"
                     alt={dict.metadata.title}
                     fill
                     className="object-contain animate-float"
