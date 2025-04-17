@@ -43,7 +43,7 @@ aitubbb.com
 - ajouter le choic des media / pas de redirection gallery
 - passer d'un mode a l'autre
 - le cas 0 pour image2sound
-- lang
+
 - prolong video
 - pop up shadcn quand la video est prete depuis le webhook
 - ajout du language toggle ds la sidebar
@@ -55,3 +55,8 @@ aitubbb.com
 -arrenger la sidebar (HOme en haut) historique en bas avec le style different (projet)
 - use result as source dans variation
 - ajouter un icone musique dasn la gallerie video si il ya du son, mettre ajour la bdd apres ajou du son
+- publier les video en public et revalidate path
+- presentation page lecteur 
+- boutton ouvrir fermer sidebar
+- breadcrum
+

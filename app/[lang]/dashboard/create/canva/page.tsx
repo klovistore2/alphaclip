@@ -10,12 +10,12 @@ import {
 import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
-  //SidebarTrigger,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
 
 import { getDictionary, Localy } from "@/app/[lang]/dictionaries"
 
-
+import { Palette } from "lucide-react"
 // --- Importez le nouveau composant ---
 import FabricCanvas from './components/FabricCanvas'; // Adaptez le chemin si nécessaire
 
@@ -34,7 +34,7 @@ return (
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
-
+          <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
@@ -49,7 +49,9 @@ return (
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{dict.canva.title}</BreadcrumbPage>
+                  <BreadcrumbPage>
+                  <Palette className="mr-2 h-5 w-5 inline" />
+                  {dict.canva.title}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

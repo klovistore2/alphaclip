@@ -12,6 +12,18 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 import { addSoundToVideoAction } from '@/lib/actions/addsoundAction';
@@ -61,6 +73,14 @@ export default function AddSoundPage() {
 
     // --- Fetch des données de la vidéo source ---
     useEffect(() => {
+        // Si videoId est '0', on n'essaie pas de charger de vidéo, mais on ne génère pas d'erreur
+        if (videoId === '0') {
+            setIsLoadingVideo(false);
+            setLoadingError(null);
+            setSourceVideo(null);
+            return;
+        }
+        
         setIsLoadingVideo(true);
         setLoadingError(null);
         setSourceVideo(null);
@@ -99,9 +119,7 @@ export default function AddSoundPage() {
             }
         }
 
-        if (videoId) {
-            fetchVideoData();
-        }
+        fetchVideoData();
     }, [videoId, dict, lang]);
 
     // --- Fonction pour lancer la génération de son ---
@@ -167,24 +185,36 @@ export default function AddSoundPage() {
     if (loadingError) {
         return <div className="container py-10 text-destructive">{loadingError}</div>;
     }
-    if (!sourceVideo) {
-        return <div className="container py-10 text-muted-foreground">{dict.add_sound.errors.invalid_source}</div>;
-    }
 
-    const displayTitle = sourceVideo?.title || dict.add_sound.untitled;
+    // Si videoId est '0', on affiche un titre spécial
+    const displayTitle = videoId === '0' 
+        ? dict.add_sound.select_video || "Select a video" 
+        : (sourceVideo?.title || dict.add_sound.untitled);
 
     return (
         <>
             <div className="md:hidden">
                 {/* ... Message pour mobile ... */}
             </div>
-            <div className="hidden h-full flex-col md:flex">
+            <SidebarInset className="flex h-full flex-col">
                 {/* Header */}
-                <div className="container flex items-center justify-between md:h-16">
-                    <h2 className="text-lg font-semibold flex items-center">
-                        <Music className="mr-2 h-5 w-5" />
-                        {dict.add_sound.title} - {displayTitle}
-                    </h2>
+                <div className="flex h-16 shrink-0 items-center px-4">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="mx-2 h-4" />
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>
+                                    <Music className="mr-2 h-5 w-5 inline" />
+                                    {dict.add_sound.title} - {displayTitle}
+                                </BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
                 </div>
                 <Separator />
 
@@ -210,8 +240,20 @@ export default function AddSoundPage() {
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                                {dict.add_sound.preview_unavailable}
+                                            <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                                                {videoId === '0' ? (
+                                                    <>
+                                                        <p className="text-muted-foreground mb-4">{dict.add_sound.no_video_selected || "No video selected"}</p>
+                                                        <Button 
+                                                            onClick={() => router.push(`/${lang}/dashboard/gallery/videos`)}
+                                                            variant="outline"
+                                                        >
+                                                            {dict.add_sound.select_from_gallery || "Select from gallery"}
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-muted-foreground">{dict.add_sound.preview_unavailable}</p>
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -239,11 +281,18 @@ export default function AddSoundPage() {
                                         </div>
                                         <Button
                                             type="button"
-                                            onClick={handleAddSound}
-                                            disabled={isGenerating || !prompt || !sourceVideo}
+                                            onClick={videoId === '0' ? 
+                                                () => router.push(`/${lang}/dashboard/gallery/videos`) : 
+                                                handleAddSound}
+                                            disabled={videoId !== '0' && (isGenerating || !prompt || !sourceVideo)}
                                             size="lg"
                                         >
-                                            {isGenerating ? (
+                                            {videoId === '0' ? (
+                                                <>
+                                                    <Music className="mr-2 h-4 w-4" />
+                                                    {dict.add_sound.select_from_gallery}
+                                                </>
+                                            ) : isGenerating ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                     {dict.add_sound.generating}
@@ -311,7 +360,7 @@ export default function AddSoundPage() {
                         </Card>
                     </div>
                 </div>
-            </div>
+            </SidebarInset>
         </>
     );
 }

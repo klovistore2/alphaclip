@@ -17,7 +17,7 @@ export default async function LangLayout({
     return (
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
+        defaultTheme="dark"
         enableSystem
         disableTransitionOnChange
       >

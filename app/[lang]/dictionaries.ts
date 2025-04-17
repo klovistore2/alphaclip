@@ -46,11 +46,15 @@ export interface TypeDictionary {
     generating: string;
     untitled: string;
     view_video: string;
+    select_video: string;
+    no_video_selected: string;
+    select_from_gallery: string;
     errors: {
       invalid_source: string;
       missing_prompt: string;
       loading_failed: string;
       general: string;
+      no_video_selected: string;
     };
     success: string;
     how_it_works: {

@@ -14,7 +14,19 @@ import { Select} from "@/components/ui/select"
 import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 import { generateScribbleImageAction } from '@/lib/actions/scribbleAction';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+  } from "@/components/ui/breadcrumb"
 
+  import {
+    SidebarInset,
+    SidebarTrigger,
+  } from "@/components/ui/sidebar"
 // Type local pour les données du dessin récupérées via l'API
 interface FetchedDrawingData {
     id: string;
@@ -235,14 +247,24 @@ export default function ScribblePlaygroundPage() {
     // --- Rendu JSX ---
     return (
         <>
-            <div className="md:hidden"> {/* ... */} </div>
-            <div className="hidden h-full flex-col md:flex">
-                {/* Header */}
-                <div className="container flex items-center justify-between md:h-16">
-                    <h2 className="text-lg font-semibold flex items-center">
-                        <PencilLine className="mr-2 h-5 w-5" />
-                        {dict.scribble.title} - {displayTitle}
-                    </h2>
+            <SidebarInset className="flex h-full flex-col">
+                <div className="flex h-16 shrink-0 items-center px-4">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="mx-2 h-4" />
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>
+                                    <PencilLine className="mr-2 h-5 w-5 inline" />
+                                    {dict.scribble.title} - {displayTitle}
+                                </BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
                 </div>
                 <Separator />
 
@@ -395,7 +417,7 @@ export default function ScribblePlaygroundPage() {
                         {/* ... */}
                     </div>
                 </div>
-            </div>
+            </SidebarInset>
         </>
     )
 }

@@ -3,6 +3,10 @@ import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
 
+
+export const dynamic = 'force-dynamic'
+
+
 export default async function Page({
   params,
 }: {

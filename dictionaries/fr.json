@@ -20,11 +20,15 @@
     "generating": "Génération du son...",
     "untitled": "Vidéo sans titre",
     "view_video": "Voir la vidéo avec son",
+    "select_video": "Sélectionner une vidéo",
+    "no_video_selected": "Aucune vidéo sélectionnée",
+    "select_from_gallery": "Sélectionner depuis la galerie",
     "errors": {
       "invalid_source": "La vidéo source n'est pas chargée ou est invalide.",
       "missing_prompt": "Veuillez entrer une description pour le son.",
       "loading_failed": "Impossible de charger la vidéo source.",
-      "general": "L'ajout de son a échoué."
+      "general": "L'ajout de son a échoué.",
+      "no_video_selected": "Aucune vidéo sélectionnée. Veuillez choisir une vidéo depuis la galerie."
     },
     "success": "L'ajout de son a été lancé. Le traitement peut prendre plusieurs minutes.",
     "how_it_works": {

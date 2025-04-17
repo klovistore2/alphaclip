@@ -20,11 +20,15 @@
       "generating": "Generating sound...",
       "untitled": "Untitled video",
       "view_video": "View video with sound",
+      "select_video": "Select a video",
+      "no_video_selected": "No video selected",
+      "select_from_gallery": "Select from gallery",
       "errors": {
         "invalid_source": "Source video is not loaded or is invalid.",
         "missing_prompt": "Please enter a description for the sound.",
         "loading_failed": "Failed to load source video.",
-        "general": "Failed to add sound."
+        "general": "Failed to add sound.",
+        "no_video_selected": "No video selected. Please choose a video from the gallery."
       },
       "success": "Sound addition has been started. Processing may take several minutes.",
       "how_it_works": {

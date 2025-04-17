@@ -10,6 +10,18 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import {
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 import { getDictionary, Localy, TypeDictionary } from '@/app/[lang]/dictionaries';
 
 import { generateImageVariationAction } from '@/lib/actions/variationActions';
@@ -216,13 +228,25 @@ export default function ImageVariationPage() {
             <div className="md:hidden">
                 {/* Version mobile... */}
             </div>
-            <div className="hidden h-full flex-col md:flex">
+            <SidebarInset className="flex h-full flex-col">
                 {/* Header */}
-                <div className="container flex items-center justify-between md:h-16">
-                    <h2 className="text-lg font-semibold flex items-center">
-                        <Wand2 className="mr-2 h-5 w-5" />
-                        {dict.variation.title} - {displayTitle}
-                    </h2>
+                <div className="flex h-16 shrink-0 items-center px-4">
+                    <SidebarTrigger className="-ml-1" />
+                    <Separator orientation="vertical" className="mx-2 h-4" />
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink href={`/${lang}/dashboard`}>Dashboard</BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>
+                                    <Wand2 className="mr-2 h-5 w-5 inline" />
+                                    {dict.variation.title} - {displayTitle}
+                                </BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
                 </div>
                 <Separator />
 
@@ -372,7 +396,7 @@ export default function ImageVariationPage() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </SidebarInset>
         </>
     );
 }
