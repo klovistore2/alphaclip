@@ -48,15 +48,12 @@ aitubbb.com
 
 - pop up shadcn quand la video est prete depuis le webhook
 
-- text2image au moins 2 model
 
 - resend
 
 - arrenger la sidebar (HOme en haut) historique en bas avec le style different (projet)
 
-- ajouter un icone musique dasn la gallerie video si il ya du son, mettre ajour la bdd apres ajou du son
-
-- presentation page lecteur 
+- presentation page lecteur, commentiares ??
 
 - boutton ouvrir fermer sidebar
 
@@ -66,4 +63,4 @@ aitubbb.com
 - refaire footer
 - video presentation
 - favicon vercel ??
-
+- ajout traduction
